@@ -2472,103 +2472,8 @@ all:RegisterAuras( {
 
 
 all:RegisterPotions( {
-    speed = {
-        item = 40211,
-        buff = "speed",
-        aura = {
-            id = 53908,
-            duration = 15,
-            max_stack = 1
-        }
-    },
-    runic_mana_injector = {
-        item = 42545
-    },
-    wild_magic = {
-        item = 40212,
-        buff = "wild_magic",
-        aura = {
-            id = 53908,
-            duration = 15,
-            max_stack = 1
-        }
-    },
-    runic_mana_potion = {
-        item = 33448
-    },
-    indestructible_potion = {
-        item = 40093,
-        buff = "indestructible",
-        aura = {
-            id = 53762,
-            duration = 120,
-            max_stack = 1
-        }
-    },
-    endless_mana_potion = {
-        item = 43570
-    },
-    runic_healing_potion = {
-        item = 33447
-    },
-    runic_healing_injector = {
-        item = 41166
-    },
-    crazy_alchemists_potion = {
-        item = 40077
-    },
-    nightmares = {
-        item = 40081,
-        buff = "nightmare_slumber",
-        aura = {
-            id = 53753,
-            duration = 6,
-            max_stack = 1
-        },
-    },
-    endless_healing_potion = {
-        item = 43569
-    },
-    powerful_rejuvenation_potion = {
-        item = 40087
-    },
-    mighty_fire_protection_potion = {
-        item = 40214,
-        buff = "fire_protection",
-        aura = {
-            id = 53911,
-            duration = 120,
-            max_stack = 1
-        },
-    },
-    mighty_frost_protection_potion = {
-        item = 40215,
-        buff = "frost_protection",
-        aura = {
-            id = 53913,
-            duration = 120,
-            max_stack = 1
-        }
-    },
-    mighty_nature_protection_potion = {
-        item = 40216,
-        buff = "nature_protection",
-        aura = {
-            id = 53914,
-            duration = 120,
-            max_stack = 1,
-        },
-    },
-    mighty_shadow_protection_potion = {
-        item = 40217,
-        buff = "shadow_protection",
-        aura = {
-            id = 53915,
-            duration = 120,
-            max_stack = 1,
-        }
-    },
-    mighty_arcane_protection_potion = {
+    -- TODO: Add potions
+    --[[mighty_arcane_protection_potion = {
         item = 40213,
         buff = "arcane_protection",
         aura = {
@@ -2576,7 +2481,7 @@ all:RegisterPotions( {
             duration = 120,
             max_stack = 1,
         }
-    },
+    },]]
 } )
 
 
@@ -2737,24 +2642,6 @@ local gotn_classes = {
     PALADIN = 59542
 }
 
-all:RegisterAura( "gift_of_the_naaru", {
-    id = gotn_classes[ UnitClassBase( "player" ) or "WARRIOR" ],
-    duration = 5,
-    max_stack = 1,
-    copy = { 28800, 121093, 59545, 59547, 59543, 59544, 59548, 59542 }
-} )
-
-all:RegisterAbility( "gift_of_the_naaru", {
-    id = 59544,
-    cast = 0,
-    cooldown = 180,
-    gcd = "off",
-
-    handler = function ()
-        applyBuff( "gift_of_the_naaru" )
-    end,
-} )
-
 
 all:RegisterAbilities( {
     global_cooldown = {
@@ -2769,7 +2656,7 @@ all:RegisterAbilities( {
         copy = 61304
     },
 
-    ancestral_call = not Hekili.IsWrath() and {
+    ancestral_call = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 274738,
         cast = 0,
         cooldown = 120,
@@ -2783,7 +2670,7 @@ all:RegisterAbilities( {
         end,
     } or nil,
 
-    arcane_pulse = not Hekili.IsWrath() and {
+    arcane_pulse = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 260364,
         cast = 0,
         cooldown = 180,
@@ -2811,7 +2698,7 @@ all:RegisterAbilities( {
         end,
     },
 
-    hyper_organic_light_originator = not Hekili.IsWrath() and {
+    hyper_organic_light_originator = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 312924,
         cast = 0,
         cooldown = 180,
@@ -2824,7 +2711,7 @@ all:RegisterAbilities( {
         end
     } or nil,
 
-    bag_of_tricks = not Hekili.IsWrath() and {
+    bag_of_tricks = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 312411,
         cast = 0,
         cooldown = 90,
@@ -2833,7 +2720,7 @@ all:RegisterAbilities( {
         toggle = "cooldowns",
     } or nil,
 
-    haymaker = not Hekili.IsWrath() and {
+    haymaker = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 287712,
         cast = 1,
         cooldown = 150,
@@ -2952,7 +2839,7 @@ all:RegisterAbilities( {
     },
 
 
-    lights_judgment = not Hekili.IsWrath() and {
+    lights_judgment = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 255647,
         cast = 0,
         cooldown = 150,
@@ -2990,7 +2877,7 @@ all:RegisterAbilities( {
     },
 
 
-    fireblood = not Hekili.IsWrath() and {
+    fireblood = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 265221,
         cast = 0,
         cooldown = 120,
@@ -4218,7 +4105,7 @@ end
 
 -- Mechagon
 do
-    if not Hekili.IsWrath() then
+    if not Hekili.IsWrath() and not Hekili.IsClassic() then
         all:RegisterGear( "pocketsized_computation_device", 167555 )
         all:RegisterGear( "cyclotronic_blast", 167672 )
         all:RegisterGear( "harmonic_dematerializer", 167677 )
@@ -6846,7 +6733,7 @@ Hekili.SpecChangeHistory = {}
 function Hekili:SpecializationChanged()
     local currentSpec, currentID, _, currentClass
 
-    if Hekili.IsWrath() then
+    if Hekili.IsWrath() or Hekili.IsClassic() then
         currentSpec = 1
         _, currentClass, currentID = UnitClass( "player" )
     else
@@ -6901,7 +6788,7 @@ function Hekili:SpecializationChanged()
 
     local specs = { 0 }
 
-    if Hekili.IsWrath() then
+    if Hekili.IsWrath() or Hekili.IsClassic() then
         specs[ 2 ] = currentID
         state.spec.id = currentID
         state.spec.name = currentClass
@@ -7185,7 +7072,7 @@ end
 do
     RegisterEvent( "PLAYER_ENTERING_WORLD", function( event, login, reload )
         if login or reload then
-            if Hekili.IsWrath() then
+            if Hekili.IsWrath() or Hekili.IsClassic() then
                 if state.spec.id ~= select( 3, UnitClass( "player" ) ) then Hekili:SpecializationChanged() end
             else
                 local currentSpec = GetSpecialization()

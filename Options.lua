@@ -33,7 +33,7 @@ local NewFeature = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0|
 local GreenPlus = "Interface\\AddOns\\Hekili\\Textures\\GreenPlus"
 local RedX = "Interface\\AddOns\\Hekili\\Textures\\RedX"
 local BlizzBlue = "|cFF00B4FF"
-local ClassColor = Hekili.IsWrath() and RAID_CLASS_COLORS[ class.file ] or C_ClassColor.GetClassColor( class.file )
+local ClassColor = (Hekili.IsWrath() or Hekili.IsClassic()) and RAID_CLASS_COLORS[ class.file ] or C_ClassColor.GetClassColor( class.file )
 
 -- Simple bypass for Wrath-friendliness.
 local GetSpecialization = _G.GetSpecialization or function() return GetActiveTalentGroup() end
@@ -5230,7 +5230,7 @@ do
         while( true ) do
             local id, name, description, texture, baseName, coords
 
-            if Hekili.IsWrath() then
+            if Hekili.IsWrath() or Hekili.IsClassic() then
                 if i > 1 then break end
                 name, baseName, id = UnitClass( "player" )
                 coords = CLASS_ICON_TCOORDS[ baseName ]

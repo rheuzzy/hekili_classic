@@ -6245,7 +6245,7 @@ do
                     local baseInt = min( 20, effectiveStat )
                     local bonusInt = effectiveStat - baseInt
 
-                    res.modmax = res.max - ( baseInt + bonusInt * MANA_PER_INTELLECT )
+                    res.modmax = res.max - ( baseInt + bonusInt * (Hekili.IsClassic() and 15 or MANA_PER_INTELLECT) )
                 end
 
                 res.last_tick = rawget( res, "last_tick" ) or 0
