@@ -1153,4 +1153,68 @@ if Hekili.IsWrath() then
         [2284] = { 65661, 66191, 66192 },
         [2285] = { 66799, 66814, 66815, 66816, 66817 },
     }
+elseif Hekili.IsClassic() then
+    ns.WrathTalentToSpellID = {
+        [23] = { 16814, 16815, 16816, 16817, 16818 }, -- Improved Wrath
+        [24] = { 16689, 16810, 16811, 16812, 16813, 17329 }, -- Nature's Grasp
+        [25] = { 17245, 17247, 17248, 17249 }, -- Improved Nature's Grasp
+        [26] = { 16918, 16919, 16920 }, -- Improved Entangling Roots
+        [27] = { 16821, 16822, 16823, 16824, 16825 }, -- Improved Moonfire
+        [28] = { 16902, 16903, 16904, 16905, 16906 }, -- Natural Weapons
+        [29] = { 16833, 16834, 16835 }, -- Natural Shapeshifter
+        [30] = { 16836, 16839, 16840 }, -- Improved Thorns
+        [31] = { 16864 }, -- Omen of Clarity
+        [32] = { 16819, 16820 }, -- Nature's Reach
+        [33] = { 16909, 16910, 16911, 16912, 16913 }, -- Vengeance
+        [34] = { 16850, 16923, 16924, 16925, 16926 }, -- Improved Starfire
+        [35] = { 16880 }, -- Nature's Grace
+        [36] = { 16845, 16846, 16847 }, -- Moonglow
+        [37] = { 16896, 16897, 16899, 16900, 16901 }, -- Moonfury
+        [38] = { 24858 }, -- Moonkin Form
+
+        [39] = { 16934, 16935, 16936, 16937, 16938 }, -- Ferocity
+        [40] = { 16858, 16859, 16860, 16861, 16862 }, -- Feral Aggression
+
+        [41] = { 16947, 16948, 16949, 16950, 16951 }, -- Feral Instinct
+        [42] = { 16940, 16941 }, -- Brutal Impact
+        [43] = { 16929, 16930, 16931, 16932, 16933 }, -- Thick Hide
+
+        [44] = { 17002, 24866 }, -- Feline Swiftness
+        [45] = { 16979 }, -- Feral Charge
+        [46] = { 16942, 16943, 16944 }, -- Sharpened Claws
+
+        [47] = { 16966, 16968 }, -- Improved Shred
+        [48] = { 16972, 16974, 16975 }, -- Predatory Strikes
+        [49] = { 16952, 16954 }, -- Blood Frenzy
+        [50] = { 16958, 16961 }, -- Primal Fury
+        
+        [51] = { 16998, 16999 }, -- Savage Fury
+        [52] = { 16857, 17390, 17391, 17392 }, -- Faerie Fire (Feral)
+        
+        [53] = { 17003, 17004, 17005, 17006, 24894 }, -- Heart of the Wild
+        
+        [54] = { 17007 }, -- Leader of the Pack
+        
+        [55] = { 17050, 17051, 17053, 17054, 17055 }, -- Improved Mark of the Wild
+        [56] = { 17056, 17058, 17059, 17060, 17061 }, -- Furor
+
+        [57] = { 17069, 17070, 17071, 17072, 17073 }, -- Improved Healing Touch
+        [58] = { 17063, 17065, 17066, 17067, 17068 }, -- Nature's Focus
+        [59] = { 17079, 17082 }, -- Improved Enrage
+        
+        [60] = { 17106, 17107, 17108 }, -- Reflection
+        [61] = { 5570, 24974, 24975, 24976, 24977 }, -- Insect Swarm
+        [62] = { 17118, 17119, 17120, 17121, 17122 }, -- Subtlety
+        
+        [63] = { 24968, 24969, 24970, 24971, 24972 }, -- Tranquil Spirit
+        [64] = { 17111, 17112, 17113 }, -- Improved Rejuvenation
+        
+        [65] = { 17116 }, -- Nature's Swiftness
+        [66] = { 17104, 24943, 24944, 24945, 24946 }, -- Gift of Nature
+        [67] = { 17123, 17124 }, -- Improved Tranquility
+        
+        [68] = { 17074, 17075, 17076, 17077, 17078 }, -- Improved Regrowth
+        
+        [69] = { 18562 }, -- Swiftmend
+    }
 end

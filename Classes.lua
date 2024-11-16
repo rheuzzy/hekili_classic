@@ -780,7 +780,7 @@ local HekiliSpecMixin = {
         if a.id and a.id > 0 then
             -- Hekili:ContinueOnSpellLoad( a.id, function( success )
             a.onLoad = function()
-                a.name = GetSpellInfo( a.id )
+                a.name = a.name or GetSpellInfo( a.id )
 
                 if not a.name then
                     for k, v in pairs( class.abilityList ) do
@@ -2646,6 +2646,7 @@ local gotn_classes = {
 all:RegisterAbilities( {
     global_cooldown = {
         id = 61304,
+        name = "Global Cooldown",
         cast = 0,
         cooldown = 0,
         gcd = "spell",
@@ -2803,41 +2804,6 @@ all:RegisterAbilities( {
             removeBuff( "dispellable_magic" )
         end,
     }, ]]
-
-    -- Removes all movement impairing effects and all effects which cause loss of control of your character.  This effect shares a cooldown with other similar effects.
-    will_to_survive = {
-        id = 59752,
-        cast = 0,
-        cooldown = 120,
-        gcd = "off",
-
-        startsCombat = false,
-        texture = 136129,
-
-        toggle = "defensives",
-
-        -- TODO: Detect loss of control effects.
-        handler = function ()
-        end,
-    },
-
-    shadowmeld = {
-        id = 58984,
-        cast = 0,
-        cooldown = 120,
-        gcd = "off",
-
-        usable = function ()
-            if not boss or solo then return false, "requires boss fight or group (to avoid resetting)" end
-            if moving then return false, "can't shadowmeld while moving" end
-            return true
-        end,
-
-        handler = function ()
-            applyBuff( "shadowmeld" )
-        end,
-    },
-
 
     lights_judgment = not Hekili.IsWrath() and not Hekili.IsClassic() and {
         id = 255647,
@@ -3043,68 +3009,6 @@ all:RegisterAbilities( {
         end,
     },
 
-    potion_of_nightmares = {
-        id = 53753,
-        cast = 0,
-        cooldown = 60,
-        gcd = "off",
-
-        startsCombat = false,
-
-        item = 40081,
-        bagItem = true,
-
-        usable = function ()
-            return GetItemCount( 40081 ) > 0, "requires potion_of_nightmares in bags"
-        end,
-
-        readyTime = function ()
-            local start, duration = GetItemCooldown( 40081 )
-            return max( 0, start + duration - query_time )
-        end,
-
-        handler = function()
-            applyBuff( "nightmare_slumber" )
-            setCooldown( "global_cooldown", 6 )
-        end,
-
-        auras = {
-            nightmare_slumber = {
-                id = 53753,
-                duration = 6,
-                max_stack = 1
-            }
-        }
-    },
-
-    crazy_alchemists_potion = {
-        id = 53750,
-        cast = 0,
-        cooldown = 60,
-        gcd = "off",
-
-        startsCombat = false,
-
-        item = 40077,
-        bagItem = true,
-
-        usable = function ()
-            return GetItemCount( 40077 ) > 0, "requires crazy_alchemists_potion in bags"
-        end,
-
-        readyTime = function ()
-            local start, duration = GetItemCooldown( 40077 )
-            return max( 0, start + duration - query_time )
-        end,
-
-        mana_restored = 4200,
-
-        handler = function()
-            gain( 3100, "health" )
-            gain( 4200, "mana" )
-        end,
-    },
-
     endless_mana_potion = {
         name = function() return GetItemInfo( 43570 ) end,
         cast = 0,
@@ -3265,75 +3169,6 @@ all:RegisterAbilities( {
 
         handler = function()
             gain( 4200, "mana" )
-        end,
-    },
-
-    flame_cap = {
-        id = 28714,
-        cast = 0,
-        cooldown = 180,
-        gcd = "off",
-
-        item = 22788,
-        bagItem = true,
-
-        startsCombat = false,
-        texture = 134209,
-        toggle = "cooldowns",
-
-        usable = function ()
-            if GetItemCount( 22788 ) == 0 then return false, "requires flame cap in bags"
-            elseif not IsUsableItem( 22788 ) then return false, "on cooldown or unusable" end
-            return true
-        end,
-
-        readyTime = function ()
-            local start, duration = GetItemCooldown( 22788 )
-            return max( 0, start + duration - query_time )
-        end,
-
-        handler = function ()
-            applyBuff( "flame_cap" )
-        end,
-
-        auras = {
-            flame_cap = {
-                id = 28714,
-                duration = 60,
-                max_stack = 1
-            }
-        }
-    },
-
-    global_thermal_sapper_charge = {
-        id = 56488,
-        cast = 0,
-        cooldown = 300,
-        gcd = "off",
-
-        item = 56488,
-        bagItem = true,
-
-        startsCombat = true,
-        texture = 135826,
-        toggle = "cooldowns",
-
-        usable = function ()
-            if GetItemCount( 56488 ) == 0 then return false, "requires charge in bag"
-            elseif not IsUsableItem( 56488 ) then return false, "on cooldown or unusable" end
-            return true
-        end,
-
-        readyTime = function ()
-            local start, duration = GetItemCooldown( 56488 )
-            return max( 0, start + duration - query_time )
-        end,
-
-        handler = function ()
-            if class.file == "MAGE" then
-                -- Assume we're proccing Incanter's Absorption.
-                if talent.incanters_absorption.enabled and buff.fire_ward.up then applyBuff( "incanters_absorption" ) end
-            end
         end,
     },
 

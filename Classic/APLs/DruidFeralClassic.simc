@@ -8,17 +8,7 @@ actions+=/potion
 actions+=/run_action_list,name=cat,if=buff.cat_form.up
 actions+=/cat_form,if=!up
 
-actions.cat+=/faerie_fire_feral,if=!debuff.armor_reduction.up&target.outside2
-actions.cat+=/faerie_fire_feral,if=glyph.omen_of_clarity.enabled&!buff.clearcasting.up&(target.outside2|buff.berserk.up&ff_during_berserk|!buff.berserk.up&energy.current<87)&(!rip_now|energy.current<action.rip.spend)&can_spend_ff
-actions.cat+=/berserk,if=!wait_for_tf&debuff.rip.up&!buff.clearcasting.up
-actions.cat+=/savage_roar,if=!buff.savage_roar.up
-actions.cat+=/savage_roar,if=debuff.rip.up&buff.savage_roar.up&buff.savage_roar.remains-(rip_maxremains+settings.rip_leeway)<=0&rip_maxremains+settings.min_roar_offset<=sr_new_duration&!buff.savage_roar.remains>=ttd
-actions.cat+=/rip,if=rip_now
-actions.cat+=/ferocious_bite,if=settings.ferociousbite_enabled&energy.current<67&!buff.clearcasting.up&(bite_at_end|bite_before_rip)&(!buff.berserk.up|bite_during_berserk)
-actions.cat+=/mangle_cat,if=!debuff.mangle.up&ttd>1&!wait_for_ff
-actions.cat+=/rake,if=buff.clearcasting.up&!debuff.bleed.up&ttd>9
-actions.cat+=/rake,if=!up&!buff.clearcasting.up&(should_rake|!debuff.bleed.up)&ttd>9&!wait_for_ff
-actions.cat+=/faerie_fire_feral,if=!glyph.omen_of_clarity.enabled&!debuff.armor_reduction.up&energy.current<=90
-actions.cat+=/dire_bear_form,if=should_bearweave
-actions.cat+=/gift_of_the_wild,if=should_flowerweave&mana.pct>settings.min_weave_mana&energy.current<42
-actions.cat+=/shred,if=!wait_for_ff&(excess_e>=action.shred.spend|buff.clearcasting.up|buff.berserk.up|(cooldown.faerie_fire_feral.remains<=1&energy.current>77|energy.current=100))
+actions.cat+=/shred,if=energy.current>=63|buff.clearcasting.up
+actions.cat+=/faerie_fire_feral,if=!debuff.faerie_fire_feral.up&!debuff.faerie_fire.up&target.outside2
+actions.cat+=/ferocious_bite,if=combo_points.current>=4&energy.current>=35
+actions.cat+=/shred,if=energy.current>=48

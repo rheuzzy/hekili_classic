@@ -134,7 +134,53 @@ spec:RegisterResource( Enum.PowerType.Energy )
 
 -- Talents
 spec:RegisterTalents( {
-    
+    improved_wrath = { 23, 5, 16814, 16815, 16816, 16817, 16818 },
+    natures_grasp = { 24, 1, 16689, 16810, 16811, 16812, 16813, 17329 },
+    improved_natures_grasp = { 25, 4, 17245, 17247, 17248, 17249 },
+    improved_entangling_roots = { 26, 3, 16918, 16919, 16920 },
+    improved_moonfire = { 27, 5, 16821, 16822, 16823, 16824, 16825 },
+    natural_weapons = { 28, 5, 16902, 16903, 16904, 16905, 16906 },
+    natural_shapeshifter = { 29, 3, 16833, 16834, 16835 },
+    improved_thorns = { 30, 3, 16836, 16839, 16840 },
+    omen_of_clarity = { 31, 1, 16864 },
+    natures_reach = { 32, 2, 16819, 16820 },
+    vengeance = { 33, 5, 16909, 16910, 16911, 16912, 16913 },
+    improved_starfire = { 34, 5, 16850, 16923, 16924, 16925, 16926 },
+    natures_grace = { 35, 1, 16880 },
+    moonglow = { 36, 3, 16845, 16846, 16847 },
+    moonfury = { 37, 5, 16896, 16897, 16899, 16900, 16901 },
+    moonkin_form = { 38, 1, 24858 },
+    ferocity = { 39, 5, 16934, 16935, 16936, 16937, 16938 },
+    feral_aggression = { 40, 5, 16858, 16859, 16860, 16861, 16862 },
+    feral_instinct = { 41, 5, 16947, 16948, 16949, 16950, 16951 },
+    brutal_impact = { 42, 2, 16940, 16941 },
+    thick_hide = { 43, 5, 16929, 16930, 16931, 16932, 16933 },
+    feline_swiftness = { 44, 2, 17002, 24866 },
+    feral_charge = { 45, 1, 16979 },
+    sharpened_claws = { 46, 3, 16942, 16943, 16944 },
+    improved_shred = { 47, 2, 16966, 16968 },
+    predatory_strikes = { 48, 3, 16972, 16974, 16975 },
+    blood_frenzy = { 49, 2, 16952, 16954 },
+    primal_fury = { 50, 2, 16958, 16961 },
+    savage_fury = { 51, 2, 16998, 16999 },
+    faerie_fire_feral = { 52, 4, 16857, 17390, 17391, 17392 },
+    heart_of_the_wild = { 53, 5, 17003, 17004, 17005, 17006, 24894 },
+    leader_of_the_pack = { 54, 1, 17007 },
+    improved_mark_of_the_wild = { 55, 5, 17050, 17051, 17053, 17054, 17055 },
+    furor = { 56, 5, 17056, 17058, 17059, 17060, 17061 },
+    improved_healing_touch = { 57, 5, 17069, 17070, 17071, 17072, 17073 },
+    natures_focus = { 58, 5, 17063, 17065, 17066, 17067, 17068 },
+    improved_enrage = { 59, 2, 17079, 17082 },
+    reflection = { 60, 3, 17106, 17107, 17108 },
+    insect_swarm = { 61, 5, 5570, 24974, 24975, 24976, 24977 },
+    subtlety = { 62, 5, 17118, 17119, 17120, 17121, 17122 },
+    tranquil_spirit = { 63, 5, 24968, 24969, 24970, 24971, 24972 },
+    improved_rejuvenation = { 64, 3, 17111, 17112, 17113 },
+    natures_swiftness = { 65, 1, 17116 },
+    gift_of_nature = { 66, 5, 17104, 24943, 24944, 24945, 24946 },
+    improved_tranquility = { 67, 2, 17123, 17124 },
+    improved_regrowth = { 68, 5, 17074, 17075, 17076, 17077, 17078 },
+    swiftmend = { 69, 1, 18562 },
 } )
 
 -- Auras
@@ -1508,7 +1554,7 @@ spec:RegisterAbilities( {
 
     -- Increases damage done by 80 for 6 sec.
     tigers_fury = {
-        id = 50213,
+        id = 5217,
         cast = 0,
         cooldown = 1,
         gcd = "off",
@@ -1521,6 +1567,8 @@ spec:RegisterAbilities( {
 
         handler = function ()
         end,
+
+        copy = { 5217, 6793, 9845, 9846 }
     },
 
 
@@ -1638,13 +1686,13 @@ spec:RegisterOptions( {
 
     potion = "speed",
 
-    package = "Feral DPS",
+    package = "Feral",
     usePackSelector = true
 } )
 
 
 -- Default Packs
-spec:RegisterPack( "Feral", 20231026.2, [[Hekili:nV1xVnoUr8pl(fb7l76A7ehVlqCEO4qb2TfBpaF46BsIwIYriYsguujxkm0N9oKuuII)rwjBsX9qcSPgoZW5p)gsoY(l9)D)DXik2)hRwS66LlwD78LRwD9QB83rF5e2F3ju0JOdWhYrhH))pWeuwD4V(B7QdN(T)ygJGxYkqXmgvwurIaI83TVknJ(TC)925(kG2t4i)FSCP)UhsJJXcsXLr(7(pf0)1)SoukjsvACD4VrsliP0uCz93R)(VxC4qgUoef)ekpcdpNuqr00IC4t4OIJhX5X8VxwhMcdsFaOokdvcFV4e)bZbvNuKKMbkmksm0j(K3JOxT9VDerEmOijaMAWZPzXFknz7KQtEt2xLKm)qAcv9PZRov)DBSH(qbjVSzY2jjcrdskih7lH4ucoypgr4pZj)pvWx2FV9PWyvL4Guk(yP6Gsc7g5bWbta)aooaffHZado7rFIn9IKKGdrXBxYuQsmnyFrEv5CWbq2KW8mb3CkA7sVPCDLMEa4uqsf5fqrpFoQOilU458EpGGpIsZlVF7Y1ZuvdsvEG4BbzPL0pXc02Yw4pJrpHzY3U9WtstA(HaCoAFgeimg(gqr5pgGkgI3tSWCpg3EcdFfFeceV)gUgeCSigly5RwjETkWBuESam1LRmGJjhT10QXWmBmsDEAb0kbNSzWsk6clmJ2avHC4L5rvecoNE31l(Siilkdw9rOskyryA(Y1NpVyMoRtqyskoiHzq5bQCL4q2lNEyEbalWsAbGaal5L5sZ6KymxciYXcsabhxXzjtiue5aMoVOIwMgJxnkPDbHzDXmvtqNpZjBpyMWKhzuaMO4kclAOzWZNNOtJMP7lBM5nDcj9uqEXZNpR9uXkzo845aiqE8mViuEa)Jbjj6R0gPWTMpJs5o4aAIxJPJXLwOlTfNoRkrpbvucificND85Om4LNsFHAz(MJ1G(85PmZXr0F289RaSnMAwYywqgg)m6Lz3TDHNlYoMMZzilMfg8UTLKGC8ZmFdh90ZC50c8rPX6lmqmSfuJpYi8ctkIslQkd2d45nqXc9O9rSN0cqO5IVDJRWn(SG0uWzdHASVShdEuqJtpXcA0ISAOPFaOrU3ruouwoObHqMvjgLNmrJVFPxx4Jzugb9OcmLMslziSsXXs(9vxSyIRWrVPLpuuLfhWOesI046mbBhunFNbz08AB)6cDb2V(apqqSgARtQpd9nOOmNKSINXIz5boh08tr077fGZFwa7z662ngqGLpaRL(WcjjEtX)zeUSmaF)2gCgoDcKMgWnn)IbK35ZtB3iHHfxMvDhSjK(649B2OJ1TD5IfZMPvhIvs8Dfc)DcX2jkCJc)rv8SH9ka9A21Bx4DPn2zJH6W9sGGRYGtgKh9IT50hjzA3gqtJlYKH1rfes1jAbz7YZNnj5yfnnJJjVDjyvHnmxeCQinNw2gwSWzDciSY6ArgSpS4Edsd2bayuCrWvTwlR(SwmV)APwLpNEQ1jAciiF6qGc2y7hf0M1O33xOEviOwO73rqi7CxD)4ngkyi70IZjGx2eyPnZVj1KnhNc8iQkZKfURiZezlmJm(GXerOXvtDiDVws7gTjysfCRVQ1sQUZqCOQ08uwzTNaRnZqlo0dn9iCMRIG4u8NEcLvH3oTXhtjqIadJpU64r2PF9UgQ1C(CZ(5vM4Ofg7YtIdYqrSdKlLNmMsomV(O(yLuu0J3T(nkjaqfoKxXjg4wAcZJjPEUvvQX43jDML)xMU(ZwvRzIzfGZkXBxmAvKHZqH)mSho0npDHlXY(IZN0YP3IZYq)gWk6ATy1q(2mx4JaMgdqwxgMHpoTh3mF9R0wzr94WozzdDdmSfG9z(Xahk5Ulio2s6UL2S1DBlY(dTJ31dvZeuZramp(5k3XmIN7c4ZU(1glOgnAgQ4AXPGyokV1Rqj6V2pF2962otfBIGnIHf)2f2b4f11F9bb93FSBc4bdrVaHIbIIaLaNho442bKNYkuJP(7Ec0fysQxVU)UNrewbPs)DF74PccLD94FPouW)6qwMy586V7VJ)j2923ks4l)G3sGMSk))U8UX93PNnlMFGOTa9tQ9PGgPXMiiBfctq(7gmpUo0RoCsDOTS5oDXiIJjXRDkrMpTo8U6WLl64HiaWFNINHT4bgDdJrsYAC3QCgizTtzP6xRdVxA3vs8RdVQoCOK)(eyhaGtJlqGoTNjvBlXBDQ)dap0X22rawTr1APOkAwSVOsMP)RpXF9YQxF7wD45ZdzZSR6q4WODJ3Qe60Ls6ZI1HudQTmNoU1)Kg8qXRxuh(56WP2d15PbWXP5llGYzDcx5K328SUZ7GSQrL65(Wlmc0UN63Co5OufNMMPgkIWuPD9kCAnUggbPtStTfx1x2aoaPyHPjVSwoBSqFtAz7fRlNT6f7Cb72nd5fvU(DoF7DB4JdavIQniuMKl9VADL0GUXhgtXubTWx7J3SVtzUs)BLNdcA5c85g872YZC8gEsAxNVyAAxPFptQvL7EysuASttZg34mIyPUzcd0cxADgd3baxXW3Uzm5ukDfOjFQFNb6NhyK(0od98nf4R(T0yyW(oWO2EiiWGOXCm5LY1KYnpBulIbopmwVtlsN8330CGEI)RkEn0JIkkURbamB4StPLvP7eTivgQXS(AYGgIwL7JU2GrChKw81fxaQBP7Ae694OJt97hcNnUHmnVBqU2kVFqUf0XDe6kD6gLcF6xhjxBgevvTZsnoD5TJkWsAQGO0YeLYBgHnwl8Xge47LBGIWnT06kfmmB2yVohBolwWdevYU5ASytrX4eyZNDBmsss7lNI2E(wPsK4LvrJIbcuC8cQiuZw0nMnQ)RQIyTnuxneoe2wXuwMoEZzCEyc3WoMVLp8YGyJ39dL05(VvggNdtKQmyL9be9eRsN)iMq7Evr4rh30QUMVwkJxJBpU7WBJ4TP1Vlk3WfXfPLkVlmoSwRgNuBA(WWBdqxMJM1xSKRkVKcqKs3fDn4PDgvLK3Wb8Dx(QRPgwv9bqoC0yHo2CHRj4NOuV2rm366QcurX1A(ImoZ6nbA5SJUUoG1(J5m80UqZpg)FpG6pUtX9kohM7qU)pEKE3rVwQxFR4mpJPKM1JdoMOAL9FdXNnDa25HFCxgAkFFxd1zFzbCMnBOEBlPRXbBPn3Cke2g3NJJVtixNGWDHPXOz)0QLm5qA8Dt(vAEgR7qBGYztgNT(VkRi5XBCxR0(MR7)6h4Ed2k2o5ugUg6hX5nwFHZB4(0T)0hTByisQXL)BP2qXjEsshNK3ul7tzvyouGRgQZvWRBoRbZjz2ADodB2IJ6WwqWVSQ0zluAwQqYwBSn3bTwvf6F302GWB0I0e76HDgXV4FvxRJldVzLWBDS)UfTlSMa)(TzUo8x4jHR51UCSaNzRYWOSKoVVEptH1HoWBy1fOWwNOvTDM9aWsTOr6hS3dgRUclTE4v4nSvN5Y2zBHRxW6DZ81xKMlzHT0Hin8GlUvXxzN56Dhb27mNEMw)T(2RdQmMQlefDZwlGSKg0V4GyxZgIHBxA)z7mSnX80dw(XgPUW6)7uA4TTQD(oXVoPH3KPP(yCgC7N6QxFuTDJoIOfujo(FNB7NwgQIPF(7(vCY)ff9aNE))3d]] )
+spec:RegisterPack( "Feral", 20241116.1, [[Hekili:ns1sVTnmm4Fl5sXgwHxStqVLldfdizdzfqfB3OTSeDIqTLmKKBr3b9BFuYnpAEuSlbuKF8JF8rmKdpcmj3JW6IPfZZZZVllF68Iz5aZ)ApcSEU4j(gYqZ7OF)oA5TrVV2A4Yy2oZGvqraw9GQ1Vud1xMscApkG15e3BvsjoIeDcG9hJ)N)iuLypuDVDqjdvpyvgRYRqxyvy1JMnBAXqfx(mxlqkU145ELrtwOW01HAz6TluPiN(TeArl3rVn9PazKYTMgvlPxUy0vFk5AU)ll(Ah3(uPPPKsT8fvR8wvZIjd93mPEOPjBJQXFC0SH(WQlrJFRXQDVL8LHi4(YgJT79vqQSyznYTPyxL)EtQTxTpk5BWHLkp25o25oGh8yh0LJVkBvo)TXT6csmrDKKWoHDCXpxVa7z06OyPL8S8Pf3LvaSx4wTsVXbSLD9gRpULkOvMyCnfROllScyjR0Th2WhA9K560T4iuGTVDagQ51TOe(g4PQDmOX27eeZIio4HjOti0Q4X7Z33Fhi6KPYO(khV4PeI0o)Q0ojuDmx7kaetJTFTTVdVohHQBcvK11o2ouJtVt3pz(Fe4415hpQoxpNDAEXoECm9r7N0uPM7q5V0V95e6p8pWcvFA5V)mL7quFa7ES5VCX2eE4Fp]] )
 
 spec:RegisterPackSelector( "balance", "Balance (IV)", "|T136096:0|t Balance",
     "If you have spent more points in |T136096:0|t Balance than in any other tree, this priority will be automatically selected for you.",
@@ -1652,14 +1700,8 @@ spec:RegisterPackSelector( "balance", "Balance (IV)", "|T136096:0|t Balance",
         return tab1 > max( tab2, tab3 )
     end )
 
-spec:RegisterPackSelector( "feral_dps", "Feral DPS (IV)", "|T132115:0|t Feral DPS",
+spec:RegisterPackSelector( "feral", "Feral", "|T132115:0|t Feral",
     "If you have spent more points in |T132276:0|t Feral than in any other tree and have not taken Thick Hide, this priority will be automatically selected for you.",
     function( tab1, tab2, tab3 )
         return tab2 > max( tab1, tab3 ) and talent.thick_hide.rank == 0
-    end )
-
-spec:RegisterPackSelector( "feral_tank", "Feral Tank (IV)", "|T132276:0|t Feral Tank",
-    "If you have spent more points in |T132276:0|t Feral than in any other tree and have taken Thick Hide, this priority will be automatically selected for you.",
-    function( tab1, tab2, tab3 )
-        return tab2 > max( tab1, tab3 ) and talent.thick_hide.rank > 0
     end )

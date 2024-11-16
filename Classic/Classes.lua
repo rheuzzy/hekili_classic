@@ -1,7 +1,7 @@
 local addon, ns = ...
 local Hekili = _G[ addon ]
 
-if not Hekili.IsWrath() then return end
+if not Hekili.IsWrath() and not Hekili.IsClassic() then return end
 
 local class, state = Hekili.Class, Hekili.State
 
@@ -46,9 +46,9 @@ function ns.updateTalents()
     if not Hekili.DB.profile.specs[ spec ].usePackSelector then return end
 
     -- Swap priorities if needed.
-    local tab1 = select( 3, GetTalentTabInfo(1) )
-    local tab2 = select( 3, GetTalentTabInfo(2) )
-    local tab3 = select( 3, GetTalentTabInfo(3) )
+    local tab1 = select( 5, GetTalentTabInfo(1) )
+    local tab2 = select( 5, GetTalentTabInfo(2) )
+    local tab3 = select( 5, GetTalentTabInfo(3) )
 
     local fromPackage = Hekili.DB.profile.specs[ spec ].package
 
@@ -83,6 +83,8 @@ end
 
 
 function ns.updateGlyphs()
+    if Hekili.IsClassic() then return end
+    
     for _, glyph in pairs( state.glyph ) do
         glyph.rank = 0
     end
