@@ -6249,7 +6249,7 @@ do
                 end
 
                 res.last_tick = rawget( res, "last_tick" ) or 0
-                res.tick_rate = rawget( res, "tick_rate" ) or 0.1
+                res.tick_rate = rawget( res, "tick_rate" ) or (power.type == Enum.PowerType.Energy and 2 or 0.1)
 
                 if power.type == Enum.PowerType.Mana then
                     local inactive, active = GetManaRegen()

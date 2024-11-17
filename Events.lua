@@ -1334,8 +1334,8 @@ local spell_names = setmetatable( {}, {
     end
 } )
 
-
 local lastPowerUpdate = 0
+local lastObservedEnergy = UnitPower( "player", Enum.PowerType.Energy )
 
 local function UNIT_POWER_FREQUENT( event, unit, power )
     if power == "FOCUS" and rawget( state, "focus" ) then
@@ -1352,16 +1352,13 @@ local function UNIT_POWER_FREQUENT( event, unit, power )
 
     elseif power == "ENERGY" and rawget( state, "energy" ) then
         local now = GetTime()
-        local elapsed = min( 0.12, now - ( state.energy.last_tick or 0 ) )
-
-        elapsed = elapsed > power_tick_data.energy_avg * 1.5 and power_tick_data.energy_avg or elapsed
-
-        if elapsed > 0.075 then
-            power_tick_data.energy_avg = ( elapsed + ( power_tick_data.energy_avg * power_tick_data.energy_ticks ) ) / ( power_tick_data.energy_ticks + 1 )
-            power_tick_data.energy_ticks = power_tick_data.energy_ticks + 1
+        local elapsed = (not state.energy.last_tick and 2) or now - state.energy.last_tick
+        local current_energy = UnitPower( "player", Enum.PowerType.Energy )
+        local tick_energy = current_energy - lastObservedEnergy
+        if (tick_energy >= 20 or current_energy == state.energy.max) and elapsed >= 2 then
             state.energy.last_tick = now
         end
-
+        lastObservedEnergy = current_energy
     end
     Hekili:ForceUpdate( event, true )
 end

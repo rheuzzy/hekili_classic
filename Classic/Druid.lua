@@ -129,7 +129,26 @@ spec:RegisterResource( Enum.PowerType.Rage, {
 } )
 spec:RegisterResource( Enum.PowerType.Mana )
 spec:RegisterResource( Enum.PowerType.ComboPoints )
-spec:RegisterResource( Enum.PowerType.Energy )
+spec:RegisterResource( Enum.PowerType.Energy, {
+    tick = {
+        last = function ()
+            local last_tick = state.energy.last_tick or state.now
+            local elapsed_time = max(0, state.query_time - last_tick)
+            local full_intervals = floor(elapsed_time / 2)
+            local rtn = last_tick + (full_intervals * 2)
+            return rtn
+        end,
+
+        interval = 2,
+
+        stop = function ( val )
+            return val >= state.energy.max
+        end,
+        value = function( now )
+            return 20
+        end,
+    }
+})
 
 
 -- Talents
