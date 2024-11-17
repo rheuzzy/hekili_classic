@@ -12,6 +12,8 @@ local strformat = string.format
 
 local spec = Hekili:NewSpecialization( 11 )
 
+spec:RegisterGear( "wolfshead", 8345 )
+
 local function rage_amount()
     local d = UnitDamage( "player" ) * 0.7
     local c = ( state.level > 70 and 1.4139 or 1 ) * ( 0.0091107836 * ( state.level ^ 2 ) + 3.225598133 * state.level + 4.2652911 )
@@ -105,7 +107,7 @@ spec:RegisterResource( Enum.PowerType.Rage, {
         end,
 
         interval = 1,
-        value = 2
+        value = 1,
     },
 
     mainhand = {
@@ -132,7 +134,7 @@ spec:RegisterResource( Enum.PowerType.ComboPoints )
 spec:RegisterResource( Enum.PowerType.Energy, {
     tick = {
         last = function ()
-            local last_tick = state.energy.last_tick or state.now
+            local last_tick = state.energy.last_tick > 0 and state.energy.last_tick or state.now
             local elapsed_time = max(0, state.query_time - last_tick)
             local full_intervals = floor(elapsed_time / 2)
             local rtn = last_tick + (full_intervals * 2)
@@ -570,8 +572,18 @@ spec:RegisterStateFunction( "swap_form", function( form )
 
     if form == "bear_form" or form == "dire_bear_form" then
         spend( rage.current, "rage" )
-        if talent.furor.rank==5 then
+        if talent.furor.rank == 5 then
             gain( 10, "rage" )
+        end
+        if set_bonus.wolfshead == 1 then
+            gain( 5, "rage" )
+        end
+    elseif form == "cat_form" then
+        if talent.furor.rank == 5 then
+            gain( 40, "energy" )
+        end
+        if set_bonus.wolfshead == 1 then
+            gain( 20, "energy" )
         end
     end
 
@@ -853,7 +865,7 @@ spec:RegisterAbilities( {
         toggle = "cooldowns",
 
         handler = function ()
-            gain(20, "rage" ) -- TODO: Model enrage over time
+            gain(20 + (talent.improved_enrage.rank * 5), "rage" )
             applyBuff( "enrage" )
         end,
     },
@@ -861,7 +873,7 @@ spec:RegisterAbilities( {
     -- Roots the target in place and causes 20 Nature damage over 12 sec.  Damage caused may interrupt the effect.
     entangling_roots = {
         id = 339,
-        cast = 1.5,
+        cast = function() return buff.natures_swiftness.up and 0 or 1.5 - (buff.natures_grace.up and 0.5 or 0) end,
         cooldown = 0,
         gcd = "spell",
 
@@ -873,6 +885,7 @@ spec:RegisterAbilities( {
 
         handler = function ()
             removeBuff( "clearcasting" )
+            removeBuff( "natures_swiftness" )
             applyDebuff( "target", "entangling_roots", 27 )
         end,
 
@@ -1017,18 +1030,21 @@ spec:RegisterAbilities( {
     -- Heals a friendly target for 40 to 55.
     healing_touch = {
         id = 5185,
-        cast = 3.5,
+        cast = function() return buff.natures_swiftness.up and 0 or 3.5 - (buff.natures_grace.up and 0.5 or 0) - (talent.improved_healing_touch.rank * 0.1) end,
         cooldown = 0,
         gcd = "spell",
 
-        spend = 0.17,
+        spend = function() return 0.17 * (1 - (talent.moonglow.rank * 0.03)) * (1 - (talent.tranquil_spirit.rank * 0.02)) end,
         spendType = "mana",
+
+        usable = function() return buff.moonkin_form.down end,
 
         startsCombat = true,
         texture = 136041,
 
         handler = function ()
             removeBuff( "clearcasting" )
+            removeBuff( "natures_swiftness" )
         end,
 
         copy = { 5185, 5186, 5187, 5188, 5189, 6778, 8903, 9758, 9888, 9889, 25297 },
@@ -1038,7 +1054,7 @@ spec:RegisterAbilities( {
     -- Forces the enemy target to sleep for up to 20 sec.  Any damage will awaken the target.  Only one target can be forced to hibernate at a time.  Only works on Beasts and Dragonkin.
     hibernate = {
         id = 2637,
-        cast = 1.5,
+        cast = function() return buff.natures_swiftness.up and 0 or 1.5 - (buff.natures_grace.up and 0.5 or 0) end,
         cooldown = 0,
         gcd = "spell",
 
@@ -1049,6 +1065,7 @@ spec:RegisterAbilities( {
         texture = 136090,
 
         handler = function ()
+            removeBuff( "natures_swiftness" )
         end,
 
         copy = { 2637, 18657, 18658 },
@@ -1189,7 +1206,7 @@ spec:RegisterAbilities( {
         cooldown = 0,
         gcd = "spell",
 
-        spend = function() return (buff.clearcasting.up and 0 or 0.21) * (1 - talent.moonglow.rank * 0.03) end,
+        spend = function() return ((buff.clearcasting.up and 0 or 0.21) * (1 - talent.moonglow.rank * 0.03)) * (buff.moonkin_form.up and 0.5 or 1) end,
         spendType = "mana",
 
         startsCombat = true,
@@ -1360,7 +1377,7 @@ spec:RegisterAbilities( {
     -- Returns the spirit to the body, restoring a dead target to life with 400 health and 700 mana.
     rebirth = {
         id = 20484,
-        cast = 2,
+        cast = function() return buff.natures_swiftness.up and 0 or 2 - (buff.natures_grace.up and 0.5 or 0) end,
         cooldown = 1800,
         gcd = "spell",
 
@@ -1373,6 +1390,7 @@ spec:RegisterAbilities( {
         toggle = "cooldowns",
 
         handler = function ()
+            removeBuff( "natures_swiftness" )
         end,
 
         copy = { 20484, 20739, 20742, 20747, 20748 },
@@ -1382,18 +1400,21 @@ spec:RegisterAbilities( {
     -- Heals a friendly target for 93 to 107 and another 98 over 21 sec.
     regrowth = {
         id = 8936,
-        cast = 2,
+        cast = function() return buff.natures_swiftness.up and 0 or 2 - (buff.natures_grace.up and 0.5 or 0) end,
         cooldown = 0,
         gcd = "spell",
 
-        spend = function() return (buff.clearcasting.up and 0) or 0.29 end,
+        spend = function() return ((buff.clearcasting.up and 0) or 0.29) * (1 - (talent.moonglow.rank * 0.03)) end,
         spendType = "mana",
+
+        usable = function() return buff.moonkin_form.down end,
 
         startsCombat = true,
         texture = 136085,
 
         handler = function ()
             removeBuff( "clearcasting" )
+            removeBuff( "natures_swiftness")
         end,
 
         copy = { 8938, 8939, 8940, 8941, 9750, 9856, 9857, 9858 },
@@ -1407,8 +1428,10 @@ spec:RegisterAbilities( {
         cooldown = 0,
         gcd = "spell",
 
-        spend = function() return (buff.clearcasting.up and 0) or 0.18 end,
+        spend = function() return ((buff.clearcasting.up and 0) or 0.18) * (1 - (talent.moonglow.rank * 0.03)) end,
         spendType = "mana",
+
+        usable = function() return buff.moonkin_form.down end,
 
         startsCombat = true,
         texture = 136081,
@@ -1490,7 +1513,7 @@ spec:RegisterAbilities( {
     -- Soothes the target beast, reducing the range at which it will attack you by 10 yards.  Only affects Beast and Dragonkin targets level 40 or lower.  Lasts 15 sec.
     soothe_animal = {
         id = 2908,
-        cast = 0,
+        cast = function() return buff.natures_swiftness.up and 0 or 1.5 - (buff.natures_grace.up and 0.5 or 0) end,
         cooldown = 0,
         gcd = "spell",
 
@@ -1501,6 +1524,7 @@ spec:RegisterAbilities( {
         texture = 132163,
 
         handler = function ()
+            removeBuff( "natures_swiftness" )
         end,
 
         copy = { 2908, 8955, 9901 },
@@ -1510,7 +1534,7 @@ spec:RegisterAbilities( {
     -- Causes 127 to 155 Arcane damage to the target.
     starfire = {
         id = 2912,
-        cast = function() return 3.5 * haste end,
+        cast = function() return (3.5 - (talent.improved_starfire.rank * 0.1) - (buff.natures_grace.up and 0.5 or 0)) * haste end,
         cooldown = 0,
         gcd = "spell",
 
@@ -1619,6 +1643,8 @@ spec:RegisterAbilities( {
         spend = function() return (buff.clearcasting.up and 0) or 0.7 end,
         spendType = "mana",
 
+        usable = function() return buff.moonkin_form.down end,
+
         startsCombat = true,
         texture = 136107,
 
@@ -1671,11 +1697,11 @@ spec:RegisterAbilities( {
     -- Causes 18 to 21 Nature damage to the target.
     wrath = {
         id = 5176,
-        cast = 2,
+        cast = function() return buff.natures_swiftness.up and 0 or 2 - (talent.improved_wrath.rank * 0.1) - (buff.natures_grace.up and 0.5 or 0) end,
         cooldown = 0,
         gcd = "spell",
 
-        spend = function() return ( buff.clearcasting.up and 0 or 0.08 ) * ( 1 - talent.moonglow.rank * 0.03 ) end,
+        spend = function() return ( buff.clearcasting.up and 0 or 0.08 ) * (1 - (talent.moonglow.rank * 0.03)) end,
         spendType = "mana",
 
         startsCombat = true,
@@ -1683,6 +1709,7 @@ spec:RegisterAbilities( {
 
         handler = function ()
             removeBuff( "clearcasting" )
+            removeBuff( "natures_swiftness")
         end,
 
         copy = { 5176, 5177, 5178, 5179, 5180, 6780, 8905, 9912 },

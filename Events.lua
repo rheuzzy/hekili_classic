@@ -1352,7 +1352,7 @@ local function UNIT_POWER_FREQUENT( event, unit, power )
 
     elseif power == "ENERGY" and rawget( state, "energy" ) then
         local now = GetTime()
-        local elapsed = (not state.energy.last_tick and 2) or now - state.energy.last_tick
+        local elapsed = state.energy.last_tick > 0 and now - state.energy.last_tick or 2
         local current_energy = UnitPower( "player", Enum.PowerType.Energy )
         local tick_energy = current_energy - lastObservedEnergy
         if (tick_energy >= 20 or current_energy == state.energy.max) and elapsed >= 2 then

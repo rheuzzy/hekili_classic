@@ -8,7 +8,9 @@ actions+=/potion
 actions+=/run_action_list,name=cat,if=buff.cat_form.up
 actions+=/cat_form,if=!up
 
+actions.cat+=/faerie_fire_feral,if=!debuff.faerie_fire_feral.up&target.outside2
 actions.cat+=/shred,if=energy.current>=63|buff.clearcasting.up
-actions.cat+=/faerie_fire_feral,if=!debuff.faerie_fire_feral.up&!debuff.faerie_fire.up&target.outside2
 actions.cat+=/ferocious_bite,if=combo_points.current>=4&energy.current>=35
 actions.cat+=/shred,if=energy.current>=48
+actions.cat+=/faerie_fire_feral,if=debuff.faerie_fire_feral.remains<12
+actions.cat+=/cat_form,if=energy.current<28
