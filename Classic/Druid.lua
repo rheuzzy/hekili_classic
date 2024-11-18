@@ -85,68 +85,99 @@ end)
 
 spec:RegisterStateExpr("no_finisher", function()
     local r = (
-        (not settings.bite_enabled) and (not settings.rip_enabled)
+        (not bite_enabled) and (not rip_enabled)
     )
     return r
 end)
 
-spec:RegisterStateExpr("rip_now", function()
+spec:RegisterStateExpr("should_bite", function()
     local r = (
-        (combo_points.current >= settings.rip_cp and (not debuff.rip.up)) and
-        (ttd >= end_thresh)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_at_end", function()
-    local r = (
-        (combo_points.current >= settings.bite_cp) and
-        ((ttd < end_thresh) or (debuff.rip.up and (ttd < debuff.rip.remains))) and
-        (settings.bite_enabled or settings.rip_enabled)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_before_rip", function()
-    local r = (
-        (debuff.rip.up and settings.bite_enabled) and
-        (debuff.rip.remains >= settings.bite_time)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_over_rip", function()
-    local r = (
-        (settings.bite_enabled and (not settings.rip_enabled))
+        (settings.bite_enabled and action.ferocious_bite.known)
     )
     return r
 end)
 
 spec:RegisterStateExpr("bite_now", function()
     local r = (
+        (bite_enabled and action.ferocious_bite.known) and
         (bite_before_rip or bite_over_rip) and
         (combo_points.current >= settings.bite_cp)
     )
     return r
 end)
 
-spec:RegisterStateExpr("rip_next", function()
+spec:RegisterStateExpr("bite_before_rip", function()
     local r = (
-        (rip_now or ((combo_points.current >= settings.rip_cp) and (debuff.rip.remains <= energy.time_to_tick))) and
-        (ttd - energy.time_to_tick >= end_thresh)
+        (bite_enabled) and
+        (debuff.rip.up) and
+        (debuff.rip.remains >= settings.bite_time)
     )
     return r
 end)
 
 spec:RegisterStateExpr("bite_before_rip_next", function()
     local r = (
-        bite_before_rip and
+        (bite_enabled) and
+        (bite_before_rip) and
         (debuff.rip.remains - energy.time_to_tick >= settings.bite_time)
     )
     return r
 end)
 
+spec:RegisterStateExpr("bite_over_rip", function()
+    local r = (
+        (bite_enabled) and
+        (not rip_enabled)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("bite_at_end", function()
+    local r = (
+        (bite_enabled or rip_enabled) and
+        (combo_points.current >= settings.bite_cp) and
+        ((ttd < end_thresh) or (debuff.rip.up and (ttd < debuff.rip.remains)))
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("should_rip", function()
+    local r = (
+        (settings.rip_enabled and action.rip.known)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("rip_now", function()
+    local r = (
+        (rip_enabled) and
+        (combo_points.current >= settings.rip_cp and (not debuff.rip.up)) and
+        (ttd >= end_thresh)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("rip_next", function()
+    local r = (
+        (rip_enabled) and
+        (rip_now or ((combo_points.current >= settings.rip_cp) and (debuff.rip.remains <= energy.time_to_tick))) and
+        (ttd - energy.time_to_tick >= end_thresh)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("should_innervate", function()
+    local r = (
+        (settings.innervate_enabled and action.innervate.known)
+    )
+    return r
+end)
+
+
 spec:RegisterStateExpr("innervate_before_bite", function()
+    if not should_innervate then
+        return false
+    end
     local wait = false
     if ((energy.current >= 28) and bite_before_rip and (not bite_before_rip_next)) then
         wait = true
@@ -163,6 +194,14 @@ spec:RegisterStateExpr("innervate_before_bite", function()
     end
 
     return false
+end)
+
+spec:RegisterStateExpr("should_powershift", function()
+    local r = (
+        (settings.powershift_enabled) and
+        (set_bonus.wolfshead == 1 or talent.furor.rank == 5)
+    )
+    return r
 end)
 
 -- Form Helper
@@ -1788,6 +1827,7 @@ spec:RegisterAbilities( {
 
         copy = { 5176, 5177, 5178, 5179, 5180, 6780, 8905, 9912 },
     },
+    
 } )
 
 -- Options
@@ -1810,7 +1850,7 @@ spec:RegisterOptions( {
     usePackSelector = true
 } )
 
--- Options
+-- Settings
 spec:RegisterSetting( "druid_description", nil, {
     type = "description",
     name = "Adjust the settings below according to your playstyle preference.  It is always recommended that you use a simulator "..
@@ -1843,6 +1883,23 @@ spec:RegisterSetting( "innervate_threshold", 20, {
 spec:RegisterSetting( "druid_feral_header", nil, {
     type = "header",
     name = "Feral: General"
+} )
+
+spec:RegisterSetting( "powershift_enabled", true, {
+    type = "toggle",
+    name = "Use Powershifting",
+    desc = "If unchecked, Powershifting will not be recommended.",
+    width = "1",
+} )
+
+spec:RegisterSetting( "powershift_time", 1, {
+    type = "range",
+    name = "Minimum Powershift energy tick time",
+    desc = "Specify the minimum energy tick time allowed to weave powershifting into the rotation",
+    width = "double",
+    min = 0,
+    max = 2,
+    step = 0.1,
 } )
 
 spec:RegisterSetting( "rip_enabled", false, {
@@ -1898,27 +1955,10 @@ spec:RegisterSetting( "bite_time", 4, {
     step = 1
 } )
 
-spec:RegisterSetting( "powershift_enabled", true, {
-    type = "toggle",
-    name = "Use Powershifting",
-    desc = "If unchecked, Powershifting will not be recommended.",
-    width = "1",
-} )
-
-spec:RegisterSetting( "powershift_time", 1, {
-    type = "range",
-    name = "Minimum Powershift energy tick time",
-    desc = "Specify the minimum energy tick time allowed to weave powershifting into the rotation",
-    width = "double",
-    min = 0,
-    max = 2,
-    step = 0.1,
-} )
-
 spec:RegisterSetting( "claw_trick_enabled", true, {
     type = "toggle",
-    name = "Use Claw Trick",
-    desc = "If unchecked, Claw trick during Shred logic will not be recommended.",
+    name = strformat( "Use %s trick", Hekili:GetSpellLinkWithTexture( spec.abilities.claw.id ) ),
+    desc = strformat( "If unchecked, %s trick during %s logic will not be recommended.", Hekili:GetSpellLinkWithTexture( spec.abilities.claw.id ), Hekili:GetSpellLinkWithTexture( spec.abilities.shred.id ) ),
     width = "full",
 } )
 

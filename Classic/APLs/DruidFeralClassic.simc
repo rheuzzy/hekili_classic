@@ -1,28 +1,26 @@
 actions.precombat+=/mark_of_the_wild,if=!up&!buff.gift_of_the_wild.up
 actions.precombat+=/thorns,if=!up
 actions.precombat+=/cat_form,if=!up&!buff.dire_bear_form.up
-actions.precombat+=/potion
 
-actions+=/use_items
-actions+=/potion
+actions+=/use_items,if=!buff.cat_form.up
+actions+=/potion,if=!buff.cat_form.up
 actions+=/cat_form,if=!up
 actions+=/call_action_list,name=ranged,if=target.outside2
 actions+=/run_action_list,name=cat_oom,if=mana.current<action.cat_form.cost
-actions+=/run_action_list,name=innervate_or_shift,if=energy.current<10
-actions+=/run_action_list,name=rip,if=rip_now
-actions+=/run_action_list,name=bite,if=bite_now|bite_at_end
+actions+=/call_action_list,name=innervate_or_shift,if=energy.current<10
+actions+=/run_action_list,name=rip,if=should_rip&rip_now
+actions+=/run_action_list,name=bite,if=should_bite&(bite_now|bite_at_end)
 actions+=/run_action_list,name=shred,if=energy.current>=28
-actions+=/run_action_list,name=innervate_or_shift,if=!rip_next|energy.time_to_tick>powershift_time
+actions+=/call_action_list,name=innervate_or_shift,if=!rip_next|energy.time_to_tick>powershift_time
 
 actions.cat_oom+=/rip,if=rip_now
 actions.cat_oom+=/shred,if=energy.current>=63
 actions.cat_oom+=/ferocious_bite,if=bite_now
 actions.cat_oom+=/shred
+actions.cat_oom+=/claw,if=!action.shred.known
 
-actions.innervate_or_shift+=/innervate,if=innervate_enabled&mana.pct<=innervate_threshold&ttd>2
-# TODO: MCP swap after innervate if we can
-actions.innervate_or_shift+=/cat_form,if=powershift_enabled
-# TODO: Enable powershift based on Furor / Wolfshead
+actions.innervate_or_shift+=/innervate,if=should_innervate&mana.pct<=innervate_threshold&ttd>2
+actions.innervate_or_shift+=/cat_form,if=should_powershift
 
 actions.ranged+=/tigers_fury,if=energy.current=100&target.outside5
 actions.ranged+=/faerie_fire_feral,if=!debuff.faerie_fire_feral.remains<12&target.outside2
@@ -35,10 +33,6 @@ actions.bite+=/ferocious_bite
 actions.bite+=/run_action_list,name=innervate_or_shift,if=innervate_before_bite
 
 actions.shred+=/shred
+actions.shred+=/claw,if=!action.shred.known
 actions.shred+=/claw,if=claw_trick_enabled&energy.time_to_tick>1
 actions.shred+=/run_action_list,name=innervate_or_shift,if=energy.time_to_tick>powershift_time
-
-actions.cat+=/shred,if=energy.current>=63|buff.clearcasting.up
-actions.cat+=/shred,if=energy.current>=48
-actions.cat+=/faerie_fire_feral,if=debuff.faerie_fire_feral.remains<12
-actions.cat+=/cat_form,if=energy.current<28
