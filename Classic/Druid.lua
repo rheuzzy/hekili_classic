@@ -3,53 +3,10 @@ if UnitClassBase( 'player' ) ~= 'DRUID' then return end
 local addon, ns = ...
 local Hekili = _G[ addon ]
 local class, state = Hekili.Class, Hekili.State
-local currentBuild = select( 4, GetBuildInfo() )
-
-local FindUnitDebuffByID = ns.FindUnitDebuffByID
-local round = ns.round
-
 local strformat = string.format
 
 local spec = Hekili:NewSpecialization( 11 )
 
-spec:RegisterGear( "wolfshead", 8345 )
-
-local function rage_amount()
-    local d = UnitDamage( "player" ) * 0.7
-    local c = ( state.level > 70 and 1.4139 or 1 ) * ( 0.0091107836 * ( state.level ^ 2 ) + 3.225598133 * state.level + 4.2652911 )
-    local f = 3.5
-    local s = 2.5
-
-    return min( ( 15 * d ) / ( 4 * c ) + ( f * s * 0.5 ), 15 * d / c )
-end
-
--- Combat log handlers
-local attack_events = {
-    SPELL_CAST_SUCCESS = true
-}
-
-local application_events = {
-    SPELL_AURA_APPLIED      = true,
-    SPELL_AURA_APPLIED_DOSE = true,
-    SPELL_AURA_REFRESH      = true,
-}
-
-local removal_events = {
-    SPELL_AURA_REMOVED      = true,
-    SPELL_AURA_BROKEN       = true,
-    SPELL_AURA_BROKEN_SPELL = true,
-}
-
-local death_events = {
-    UNIT_DIED               = true,
-    UNIT_DESTROYED          = true,
-    UNIT_DISSIPATES         = true,
-    PARTY_KILL              = true,
-    SPELL_INSTAKILL         = true,
-}
-
-local eclipse_lunar_last_applied = 0
-local eclipse_solar_last_applied = 0
 spec:RegisterCombatLogEvent( function( _, subtype, _, sourceGUID, sourceName, _, _, destGUID, destName, destFlags, _, spellID, spellName )
     if sourceGUID ~= state.GUID then
         return
@@ -64,6 +21,14 @@ spec:RegisterUnitEvent( "UNIT_POWER_UPDATE", "player", "COMBO_POINTS", function(
 
 end)
 
+local function rage_amount()
+    local d = UnitDamage( "player" ) * 0.7
+    local c = ( state.level > 70 and 1.4139 or 1 ) * ( 0.0091107836 * ( state.level ^ 2 ) + 3.225598133 * state.level + 4.2652911 )
+    local f = 3.5
+    local s = 2.5
+
+    return min( ( 15 * d ) / ( 4 * c ) + ( f * s * 0.5 ), 15 * d / c )
+end
 local avg_rage_amount = rage_amount()
 spec:RegisterHook( "reset_precast", function()
     if IsCurrentSpell( class.abilities.maul.id ) then
@@ -93,6 +58,156 @@ spec:RegisterStateExpr( "mainhand_remains", function()
     end
     return next_swing
 end)
+
+local dummy_names = {
+    ["Combat Dummy"] = 1
+}
+local end_thresh = 10
+spec:RegisterStateExpr("ttd", function()
+    if dummy_names[target.name] then
+        return Hekili.Version:match( "^Dev" ) and settings.dummy_ttd or 300
+    end
+
+    return target.time_to_die
+end)
+
+spec:RegisterStateExpr("next_energy_tick", function()
+    local t = energy
+    local q = state.query_time
+    for i = 1, t.fcount do
+        local v = t.forecast[ i ]
+        if v.t >= q then
+            return v.t - q
+        end
+    end
+    return 2
+end)
+
+spec:RegisterStateExpr("no_finisher", function()
+    local r = (
+        (not settings.bite_enabled) and (not settings.rip_enabled)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("rip_now", function()
+    local r = (
+        (combo_points.current >= settings.rip_cp and (not debuff.rip.up)) and
+        (ttd >= end_thresh)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("bite_at_end", function()
+    local r = (
+        (combo_points.current >= settings.bite_cp) and
+        ((ttd < end_thresh) or (debuff.rip.up and (ttd < debuff.rip.remains))) and
+        (settings.bite_enabled or settings.rip_enabled)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("bite_before_rip", function()
+    local r = (
+        (debuff.rip.up and settings.bite_enabled) and
+        (debuff.rip.remains >= settings.bite_time)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("bite_over_rip", function()
+    local r = (
+        (settings.bite_enabled and (not settings.rip_enabled))
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("bite_now", function()
+    local r = (
+        (bite_before_rip or bite_over_rip) and
+        (combo_points.current >= settings.bite_cp)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("rip_next", function()
+    local r = (
+        (rip_now or ((combo_points.current >= settings.rip_cp) and (debuff.rip.remains <= energy.time_to_tick))) and
+        (ttd - energy.time_to_tick >= end_thresh)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("bite_before_rip_next", function()
+    local r = (
+        bite_before_rip and
+        (debuff.rip.remains - energy.time_to_tick >= settings.bite_time)
+    )
+    return r
+end)
+
+spec:RegisterStateExpr("innervate_before_bite", function()
+    local wait = false
+    if ((energy.current >= 28) and bite_before_rip and (not bite_before_rip_next)) then
+        wait = true
+    elseif ((energy.current >= 15) and ((not bite_before_rip) or bite_before_rip_next or bite_at_end)) then
+        wait = true
+    elseif (not rip_next) then
+        return true
+    else
+        wait = true
+    end
+
+    if wait and (energy.time_to_tick > settings.powershift_time) then
+        return true
+    end
+
+    return false
+end)
+
+-- Form Helper
+spec:RegisterStateFunction( "swap_form", function( form )
+    removeBuff( "form" )
+    removeBuff( "maul" )
+
+    if form == "bear_form" or form == "dire_bear_form" then
+        spend( rage.current, "rage" )
+        if talent.furor.rank == 5 then
+            gain( 10, "rage" )
+        end
+        if set_bonus.wolfshead == 1 then
+            gain( 5, "rage" )
+        end
+    elseif form == "cat_form" then
+        if talent.furor.rank == 5 then
+            gain( 40, "energy" )
+        end
+        if set_bonus.wolfshead == 1 then
+            gain( 20, "energy" )
+        end
+    end
+
+    if form then
+        applyBuff( form )
+    end
+end )
+
+-- Maul Helper
+local finish_maul = setfenv( function()
+    spend( (buff.clearcasting.up and 0) or ((15 - talent.ferocity.rank) * ((buff.berserk.up and 0.5) or 1)), "rage" )
+end, state )
+
+spec:RegisterStateFunction( "start_maul", function()
+    local next_swing = mainhand_remains
+    if next_swing <= 0 then
+        next_swing = mainhand_speed
+    end
+    applyBuff( "maul", next_swing )
+    state:QueueAuraExpiration( "maul", finish_maul, buff.maul.expires )
+end )
+
+-- Gear
+spec:RegisterGear( "wolfshead", 8345 )
 
 -- Resources
 spec:RegisterResource( Enum.PowerType.Rage, {
@@ -144,14 +259,13 @@ spec:RegisterResource( Enum.PowerType.Energy, {
         interval = 2,
 
         stop = function ( val )
-            return val >= state.energy.max
+            return false
         end,
         value = function( now )
             return 20
         end,
     }
 })
-
 
 -- Talents
 spec:RegisterTalents( {
@@ -564,47 +678,6 @@ spec:RegisterAuras( {
         aliasMode = "longest"
     }
 } )
-
--- Form Helper
-spec:RegisterStateFunction( "swap_form", function( form )
-    removeBuff( "form" )
-    removeBuff( "maul" )
-
-    if form == "bear_form" or form == "dire_bear_form" then
-        spend( rage.current, "rage" )
-        if talent.furor.rank == 5 then
-            gain( 10, "rage" )
-        end
-        if set_bonus.wolfshead == 1 then
-            gain( 5, "rage" )
-        end
-    elseif form == "cat_form" then
-        if talent.furor.rank == 5 then
-            gain( 40, "energy" )
-        end
-        if set_bonus.wolfshead == 1 then
-            gain( 20, "energy" )
-        end
-    end
-
-    if form then
-        applyBuff( form )
-    end
-end )
-
--- Maul Helper
-local finish_maul = setfenv( function()
-    spend( (buff.clearcasting.up and 0) or ((15 - talent.ferocity.rank) * ((buff.berserk.up and 0.5) or 1)), "rage" )
-end, state )
-
-spec:RegisterStateFunction( "start_maul", function()
-    local next_swing = mainhand_remains
-    if next_swing <= 0 then
-        next_swing = mainhand_speed
-    end
-    applyBuff( "maul", next_swing )
-    state:QueueAuraExpiration( "maul", finish_maul, buff.maul.expires )
-end )
 
 -- Abilities
 spec:RegisterAbilities( {
@@ -1123,6 +1196,7 @@ spec:RegisterAbilities( {
 
         handler = function ()
             applyBuff( "innervate" )
+            swap_form( "" )
         end,
     },
 
@@ -1736,6 +1810,148 @@ spec:RegisterOptions( {
     usePackSelector = true
 } )
 
+-- Options
+spec:RegisterSetting( "druid_description", nil, {
+    type = "description",
+    name = "Adjust the settings below according to your playstyle preference.  It is always recommended that you use a simulator "..
+        "to determine the optimal values for these settings for your specific character.\n\n"
+} )
+
+spec:RegisterSetting( "druid_general_header", nil, {
+    type = "header",
+    name = "Druid: General"
+} )
+
+spec:RegisterSetting( "innervate_enabled", true, {
+    type = "toggle",
+    name = strformat( "Use %s", Hekili:GetSpellLinkWithTexture( spec.abilities.innervate.id ) ),
+    desc = strformat( "If unchecked, %s will not be recommended.", Hekili:GetSpellLinkWithTexture( spec.abilities.innervate.id ) ),
+    width = "1",
+} )
+
+spec:RegisterSetting( "innervate_threshold", 20, {
+    type = "range",
+    name = strformat( "Mana threshold for %s", Hekili:GetSpellLinkWithTexture( spec.abilities.innervate.id ) ),
+    desc = strformat( "If set to zero or more, %s will be recommended when reaching that mana percentage. Setting to -1 will disable the use of %s.\n\n" ..
+        "Default: 20", Hekili:GetSpellLinkWithTexture( spec.abilities.innervate.id ), Hekili:GetSpellLinkWithTexture( spec.abilities.innervate.id ) ),
+    width = "double",
+    min = 0,
+    max = 100,
+    step = 1
+} )
+
+spec:RegisterSetting( "druid_feral_header", nil, {
+    type = "header",
+    name = "Feral: General"
+} )
+
+spec:RegisterSetting( "rip_enabled", false, {
+    type = "toggle",
+    name = strformat( "Use %s", Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ) ),
+    desc = strformat( "If unchecked, %s will not be recommended.", Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ) ),
+    width = "1",
+} )
+
+spec:RegisterSetting( "rip_cp", 5, {
+    type = "range",
+    name = strformat( "Minimum Combo Points for %s", Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ) ),
+    desc = strformat( "Specify the minimum combo points for %s to be recommended\n\n"..
+        "Default: 0", Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ), Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ) ),
+    width = "double",
+    min = 1,
+    max = 5,
+    step = 1,
+} )
+
+spec:RegisterSetting( "bite_enabled", true, {
+    type = "toggle",
+    name = strformat( "Use %s", Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ) ),
+    desc = strformat( "If unchecked, %s will not be recommended.", Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ) ),
+    width = "1",
+} )
+
+spec:RegisterSetting( "bite_cp", 4, {
+    type = "range",
+    name = strformat( "Minimum Combo Points for %s", Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ) ),
+    desc = strformat( "Specify the minimum combo points for %s. Set to 0 to disable %s.\n\n"..
+        "Default: 0", Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ), Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ) ),
+    width = "double",
+    min = 1,
+    max = 5,
+    step = 1,
+} )
+
+spec:RegisterSetting( "bite_line2", nil, {
+    type = "description",
+    name = "",
+    width = "1"
+} )
+
+spec:RegisterSetting( "bite_time", 4, {
+    type = "range",
+    name = strformat( "Minimum time left on %s for %s", Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ), Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ) ),
+    desc = strformat( "If set above zero, %s will not be recommended unless %s has this much time remaining.\n\n" ..
+        "Default: 4", Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ), Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ) ),
+    width = "double",
+    min = 0,
+    softMax = 14,
+    step = 1
+} )
+
+spec:RegisterSetting( "powershift_enabled", true, {
+    type = "toggle",
+    name = "Use Powershifting",
+    desc = "If unchecked, Powershifting will not be recommended.",
+    width = "1",
+} )
+
+spec:RegisterSetting( "powershift_time", 1, {
+    type = "range",
+    name = "Minimum Powershift energy tick time",
+    desc = "Specify the minimum energy tick time allowed to weave powershifting into the rotation",
+    width = "double",
+    min = 0,
+    max = 2,
+    step = 0.1,
+} )
+
+spec:RegisterSetting( "claw_trick_enabled", true, {
+    type = "toggle",
+    name = "Use Claw Trick",
+    desc = "If unchecked, Claw trick during Shred logic will not be recommended.",
+    width = "full",
+} )
+
+if (Hekili.Version:match( "^Dev" )) then
+    spec:RegisterSetting("druid_debug_header", nil, {
+        type = "header",
+        name = "Debug"
+    })
+
+    spec:RegisterSetting("druid_debug_description", nil, {
+        type = "description",
+        name = "Settings used for testing\n\n"
+    })
+
+    spec:RegisterSetting("dummy_ttd", 300, {
+        type = "range",
+        name = "Training Dummy Time To Die",
+        desc = "Select the time to die to report when targeting a training dummy",
+        width = "full",
+        min = 0,
+        softMax = 300,
+        step = 1,
+        set = function( _, val )
+            Hekili.DB.profile.specs[ 11 ].settings.dummy_ttd = val
+        end
+    })
+
+
+    spec:RegisterSetting("druid_debug_footer", nil, {
+        type = "description",
+        name = "\n\n"
+    })
+end
 
 -- Default Packs
 spec:RegisterPack( "Feral", 20241116.1, [[Hekili:ns1sVTnmm4Fl5sXgwHxStqVLldfdizdzfqfB3OTSeDIqTLmKKBr3b9BFuYnpAEuSlbuKF8JF8rmKdpcmj3JW6IPfZZZZVllF68Iz5aZ)ApcSEU4j(gYqZ7OF)oA5TrVV2A4Yy2oZGvqraw9GQ1Vud1xMscApkG15e3BvsjoIeDcG9hJ)N)iuLypuDVDqjdvpyvgRYRqxyvy1JMnBAXqfx(mxlqkU145ELrtwOW01HAz6TluPiN(TeArl3rVn9PazKYTMgvlPxUy0vFk5AU)ll(Ah3(uPPPKsT8fvR8wvZIjd93mPEOPjBJQXFC0SH(WQlrJFRXQDVL8LHi4(YgJT79vqQSyznYTPyxL)EtQTxTpk5BWHLkp25o25oGh8yh0LJVkBvo)TXT6csmrDKKWoHDCXpxVa7z06OyPL8S8Pf3LvaSx4wTsVXbSLD9gRpULkOvMyCnfROllScyjR0Th2WhA9K560T4iuGTVDagQ51TOe(g4PQDmOX27eeZIio4HjOti0Q4X7Z33Fhi6KPYO(khV4PeI0o)Q0ojuDmx7kaetJTFTTVdVohHQBcvK11o2ouJtVt3pz(Fe4415hpQoxpNDAEXoECm9r7N0uPM7q5V0V95e6p8pWcvFA5V)mL7quFa7ES5VCX2eE4Fp]] )

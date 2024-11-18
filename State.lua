@@ -2845,6 +2845,7 @@ do
 
             elseif k == "level" then t[k] = UnitLevel( "target" ) or UnitLevel( "player" ) or MAX_PLAYER_LEVEL
             elseif k == "moving" then t[k] = GetUnitSpeed( "target" ) > 0
+            elseif k == "name" then t[k] = UnitName( "target" )
             elseif k == "real_ttd" then t[k] = Hekili:GetTTD( "target" )
             elseif k == "time_to_die" then
                 local ttd = t.real_ttd
@@ -3515,6 +3516,16 @@ local mt_resource = {
             -- Assassination, April 2021
             -- Using the same as time_to_max because our time_to_max uses modeled regen events...
             return state:TimeToResource( t, t.max )
+
+        elseif k == "time_to_tick" then
+            local q = state.query_time
+            for i = 1, t.fcount do
+                local v = t.forecast[ i ]
+                if i > 1 and v.t >= q then
+                    return v.t - q
+                end
+            end
+            return t.tick_rate
 
         elseif k:sub(1, 8) == "time_to_" then
             local amount = k:sub(9)
