@@ -1,11 +1,11 @@
 actions.precombat+=/mark_of_the_wild,if=!up&!buff.gift_of_the_wild.up
 actions.precombat+=/thorns,if=!up
-actions.precombat+=/cat_form,if=!up&!buff.bear_form.up
+actions.precombat+=/cat_form,if=!buff.form.up
 
 actions+=/use_items,if=!buff.cat_form.up
 actions+=/potion,if=!buff.cat_form.up
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
-actions+=/cat_form,if=!up
+actions+=/cat_form,if=!buff.form.up
 actions+=/call_action_list,name=ranged,if=target.outside2
 actions+=/run_action_list,name=cat_oom,if=mana.current<action.cat_form.cost
 actions+=/call_action_list,name=innervate_or_shift,if=energy.current<10
