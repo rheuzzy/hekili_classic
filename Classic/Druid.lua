@@ -261,12 +261,12 @@ spec:RegisterResource( Enum.PowerType.Rage, {
         end,
 
         interval = 1,
-        value = 1,
+        value = 2,
     },
 
     mainhand = {
         swing = "mainhand",
-        aura = "dire_bear_form",
+        aura = "bear_form",
 
         last = function ()
             local swing = state.combat == 0 and state.now or state.swings.mainhand
