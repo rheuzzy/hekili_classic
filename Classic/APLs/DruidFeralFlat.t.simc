@@ -1,0 +1,49 @@
+actions.innervate_or_shift+=/innervate,if=settings.innervate_enabled&action.innervate.known&mana.pct<=innervate_threshold&ttd>2
+actions.innervate_or_shift+=/cat_form
+
+actions.precombat+=/mark_of_the_wild,if=!up&!buff.gift_of_the_wild.up
+actions.precombat+=/thorns,if=!up
+actions.precombat+=/cat_form,if=!up&!buff.bear_form.up
+
+# can_powershift=mana.current>=settings.powershift_enabled&(set_bonus.wolfshead=1|talent.furor.rank=5)&mana.current>=action.cat_form.cost
+actions+=/use_items,if=!buff.cat_form.up
+actions+=/potion,if=!buff.cat_form.up
+actions+=/cat_form,if=!up
+actions+=/run_action_list,name=cat_oom,if=!{{can_powershift}}
+actions+=/run_action_list,name=cat_ps
+
+# rip_now=settings.rip_enabled&combo_points.current>=settings.rip_cp&!debuff.rip.up&ttd>=10
+# bite_before_rip=settings.bite_enabled&debuff.rip.up&debuff.rip.remains>=settings.bite_time
+# bite_before_rip_next={{bite_before_rip}}&debuff.rip.remains-energy.time_to_tick>=settings.bite_time
+# bite_over_rip=settings.bite_enabled&!settings.rip_enabled
+# bite_now=settings.bite_enabled&({{bite_before_rip}}|{{bite_over_rip}})&combo_points.current>=settings.bite_cp
+actions.cat_oom+=/rip,if={{rip_now}}
+actions.cat_oom+=/shred,if=energy.current>=63
+actions.cat_oom+=/ferocious_bite,if={{bite_now}}
+actions.cat_oom+=/shred
+actions.cat_oom+=/claw,if=!action.shred.known
+
+# no_finisher=!settings.bite_enabled&!settings.rip_enabled
+# bite_at_end=combo_points.current>=settings.bite_cp&(ttd<10|(debuff.rip.up&ttd-debuff.rip.remains<10))&!{{no_finisher}}
+# rip_next=settings.rip_enabled&({{rip_now}}|(combo_points.current>=settings.rip_cp&debuff.rip.remains<=energy.time_to_tick))&ttd-energy.time_to_tick>=10
+# jit_shift=energy.time_to_tick>settings.powershift_time
+actions.cat_ps+=/call_action_list,name=innervate_or_shift,if=energy.current<10
+# if0={{rip_now}}
+actions.cat_ps+=/rip,if={{if0}}
+actions.cat_ps+=/call_action_list,name=innervate_or_shift,if={{if0}}&{{jit_shift}}
+# if1={{bite_now}}|{{bite_at_end}}
+actions.cat_ps+=/shred,if=!{{if0}}&{{if1}}&(energy.current>=63|(energy.current>=15&buff.clearcasting.up))
+actions.cat_ps+=/ferocious_bite,if=!{{if0}}&{{if1}}&!buff.clearcasting.up
+# wait1=energy.current>=28&{{bite_before_rip}}&!{{bite_before_rip_next}}
+# wait2=energy.current>=15&(!{{bite_before_rip}}|{{bite_before_rip_next}}|{{bite_at_end}})
+# wait3={{rip_next}}
+actions.cat_ps+=/call_action_list,name=innervate_or_shift,if=!{{if0}}&{{if1}}&!{{wait1}}&!{{wait2}}&!{{wait3}}
+actions.cat_ps+=/call_action_list,name=innervate_or_shift,if=!{{if0}}&{{if1}}&({{wait1}}|{{wait2}}|{{wait3}})&{{jit_shift}}
+# if2=energy.current>=28
+actions.cat_ps+=/shred,if=!{{if0}}&!{{if1}}&{{if2}}
+actions.cat_ps+=/claw,if=!{{if0}}&!{{if1}}&{{if2}}&energy.time_to_tick>1&settings.claw_trick_enabled
+actions.cat_ps+=/run_action_list,name=innervate_or_shift,if=!{{if0}}&!{{if1}}&{{if2}}&energy.time_to_tick>settings.powershift_time
+# if3=!{{rip_next}}
+actions.cat_ps+=/run_action_list,name=innervate_or_shift,if=!{{if0}}&!{{if1}}&!{{if2}}&{{if3}}
+# if4=energy.time_to_tick>settings.powershift_time
+actions.cat_ps+=/run_action_list,name=innervate_or_shift,if=!{{if0}}&!{{if1}}&!{{if2}}&!{{if3}}&{{if4}}
