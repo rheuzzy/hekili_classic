@@ -1322,7 +1322,7 @@ local power_tick_data = {
     focus_avg = 0.10,
     focus_ticks = 1,
 
-    energy_avg = 0.10,
+    energy_avg = 2,
     energy_ticks = 1,
 }
 
@@ -1355,8 +1355,12 @@ local function UNIT_POWER_FREQUENT( event, unit, power )
         local elapsed = state.energy.last_tick > 0 and now - state.energy.last_tick or 2
         local current_energy = UnitPower( "player", Enum.PowerType.Energy )
         local tick_energy = current_energy - lastObservedEnergy
-        if (tick_energy >= 20 or current_energy == state.energy.max) and elapsed >= 2 then
+        if (tick_energy == 20 or current_energy == state.energy.max) and elapsed >= 1.9 and state.action.cat_form.realCast ~= state.now then
+            power_tick_data.energy_avg = ( elapsed + ( power_tick_data.energy_avg * power_tick_data.energy_ticks ) ) / ( power_tick_data.energy_ticks + 1 )
+            power_tick_data.energy_ticks = power_tick_data.energy_ticks + 1
+            state.energy.tick_time_avg = power_tick_data.energy_avg
             state.energy.last_tick = now
+            Hekili:ForceUpdate( "UNIT_POWER_UPDATE", true )
         end
         lastObservedEnergy = current_energy
     end

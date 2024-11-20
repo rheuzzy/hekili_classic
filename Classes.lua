@@ -174,6 +174,7 @@ local HekiliSpecMixin = {
             active_regen = 0,
             inactive_regen = 0,
             last_tick = 0,
+            tick_time_avg = resourceID == Enum.PowerType.Energy and 2 or nil,
 
             swingGen = false,
 
