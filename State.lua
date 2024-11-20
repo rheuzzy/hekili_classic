@@ -3377,15 +3377,8 @@ function state:TimeToResource( t, amount )
     if not amount or amount > t.max then return 3600
     elseif t.current >= amount then return 0 end
 
-    local pad, lastTick = 0
-    if t.resource == "energy" or t.resource == "focus" then
-        -- Round any result requiring ticks to the next tick.
-        lastTick = t.last_tick
-    end
-
     if t.forecast and t.fcount > 0 then
         local q = state.query_time
-        local index, slice
 
         if t.times[ amount ] then return t.times[ amount ] - q end
 
@@ -3407,13 +3400,7 @@ function state:TimeToResource( t, amount )
 
             if slice.v >= amount then
                 t.times[ amount ] = slice.t
-
-                if lastTick then
-                    pad = ( slice.t - lastTick ) % 0.1
-                    pad = 0.1 - pad
-                end
-
-                return max( 0, pad + t.times[ amount ] - q )
+                return max( 0, t.times[ amount ] - q )
 
             elseif after and after.v >= amount then
                 -- Our next slice will have enough resources.  Check to see if we'd regen enough in-between.
@@ -3421,13 +3408,8 @@ function state:TimeToResource( t, amount )
                 local deficit = amount - slice.v
                 local regen_time = deficit / t.regen
 
-                if lastTick then
-                    pad = ( slice.t - lastTick ) % 0.1
-                    pad = 0.1 - pad
-                end
-
                 if regen_time < time_diff then
-                    t.times[ amount ] = ( pad + slice.t + regen_time )
+                    t.times[ amount ] = ( slice.t + regen_time )
                 else
                     t.times[ amount ] = after.t
                 end
@@ -3439,14 +3421,8 @@ function state:TimeToResource( t, amount )
         return max( 0, t.times[ amount ] - q )
     end
 
-    -- This wasn't a modeled resource,, just look at regen time.
-    if lastTick then
-        pad = ( slice.t - lastTick ) % 0.1
-        pad = 0.1 - pad
-    end
-
     if t.regen <= 0 then return 3600 end
-    return max( 0, pad + ( ( amount - t.current ) / t.regen ) )
+    return max( 0, ( ( amount - t.current ) / t.regen ) )
 end
 
 
