@@ -2645,7 +2645,16 @@ local gotn_classes = {
 
 
 all:RegisterAbilities( {
-    global_cooldown = {
+    global_cooldown = Hekili.IsClassic() and {
+        id = 29515,
+        name = "Global Cooldown",
+        cast = 0,
+        cooldown = 0,
+        gcd = "spell",
+
+        unlisted = true,
+        known = function () return true end,
+    } or {
         id = 61304,
         name = "Global Cooldown",
         cast = 0,
@@ -2654,8 +2663,6 @@ all:RegisterAbilities( {
 
         unlisted = true,
         known = function () return true end,
-
-        copy = 61304
     },
 
     ancestral_call = not Hekili.IsWrath() and not Hekili.IsClassic() and {

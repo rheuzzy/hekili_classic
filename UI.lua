@@ -1319,7 +1319,7 @@ do
                                     local init, duration = 0, 0
 
                                     if a.gcd ~= "off" then
-                                        start, duration = GetSpellCooldown( 61304 )
+                                        start, duration = GetSpellCooldown( Hekili.IsClassic() and 29515 or 61304 )
                                         if start > 0 then moment = start + duration - now end
                                     end
 
@@ -1517,7 +1517,7 @@ do
                         local start, duration = 0, 0
 
                         if a.gcd ~= "off" then
-                            start, duration = GetSpellCooldown( 61304 )
+                            start, duration = GetSpellCooldown( Hekili.IsClassic() and 29515 or 61304 )
                             if start > 0 then moment = start + duration - now end
                         end
 
@@ -1647,7 +1647,7 @@ do
         end
 
         function d:RefreshCooldowns( event )
-            local gStart = GetSpellCooldown( 61304 )
+            local gStart = GetSpellCooldown( Hekili.IsClassic() and 29515 or 61304 )
             local cStart = ( select( 4, UnitCastingInfo( "player" ) ) or select( 4, UnitCastingInfo( "player" ) ) or 0 ) / 1000
 
             local now = GetTime()
