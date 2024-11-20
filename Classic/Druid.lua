@@ -1927,7 +1927,7 @@ spec:RegisterSetting( "bite_enabled", true, {
     width = "1",
 } )
 
-spec:RegisterSetting( "bite_cp", 4, {
+spec:RegisterSetting( "bite_cp", 5, {
     type = "range",
     name = strformat( "Minimum Combo Points for %s", Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ) ),
     desc = strformat( "Specify the minimum combo points for %s. Set to 0 to disable %s.\n\n"..
@@ -1944,7 +1944,7 @@ spec:RegisterSetting( "bite_line2", nil, {
     width = "1"
 } )
 
-spec:RegisterSetting( "bite_time", 4, {
+spec:RegisterSetting( "bite_time", 0, {
     type = "range",
     name = strformat( "Minimum time left on %s for %s", Hekili:GetSpellLinkWithTexture( spec.abilities.rip.id ), Hekili:GetSpellLinkWithTexture( spec.abilities.ferocious_bite.id ) ),
     desc = strformat( "If set above zero, %s will not be recommended unless %s has this much time remaining.\n\n" ..
