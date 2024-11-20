@@ -2472,20 +2472,6 @@ all:RegisterAuras( {
 } )
 
 
-all:RegisterPotions( {
-    -- TODO: Add potions
-    --[[mighty_arcane_protection_potion = {
-        item = 40213,
-        buff = "arcane_protection",
-        aura = {
-            id = 53910,
-            duration = 120,
-            max_stack = 1,
-        }
-    },]]
-} )
-
-
 all:RegisterAuras( {
     -- 9.0
     potion_of_spectral_strength = {
@@ -3087,24 +3073,47 @@ all:RegisterAbilities( {
 
         isItem = true,
         item = function()
-            if not Hekili.PLAYER_ENTERING_WORLD or not rawget( state, "mana" ) then return 45276 end
+            if not Hekili.PLAYER_ENTERING_WORLD or not rawget( state, "mana" ) then return 13444 end
 
             local deficit = mana.deficit
 
-            if deficit > 4200 then
-                if GetItemCount( 45276 ) > 0 then return 45276 end
-                if GetItemCount( 42545 ) > 0 then return 42545 end
-                if GetItemCount( 33448 ) > 0 then return 33448 end
-                if GetItemCount( 40077 ) > 0 then return 40077 end
-            end
-
             if deficit > 1800 then
-                if GetItemCount( 40067 ) > 0 then return 40067 end
-                if GetItemCount( 43530 ) > 0 then return 43530 end
-                if GetItemCount( 43570 ) > 0 then return 43570 end
+                if GetItemCount( 13444 ) > 0 then return 13444 end --
             end
 
-            return 45276
+            if deficit > 1600 then
+                if GetItemCount( 18253 ) > 0 then return 18253 end
+            end
+
+            if deficit > 1200 then
+                if GetItemCount( 13443 ) > 0 then return 13443 end --
+            end
+
+            if deficit > 800 then
+                if GetItemCount( 6149 ) > 0 then return 6149 end --
+            end
+
+            if deficit > 750 then
+                if GetItemCount( 9144 ) > 0 then return 9144 end --
+            end
+
+            if deficit > 520 then
+                if GetItemCount( 3827 ) > 0 then return 3827 end --
+            end
+
+            if deficit > 320 then
+                if GetItemCount( 3385 ) > 0 then return 3385 end --
+            end
+
+            if deficit > 160 then
+                if GetItemCount( 2455 ) > 0 then return 2455 end --
+            end
+
+            if deficit > 120 then
+                if GetItemCount( 2456 ) > 0 then return 2456 end --
+            end
+
+            return 13444
         end,
         bagItem = true,
 
@@ -3124,6 +3133,249 @@ all:RegisterAbilities( {
             class.abilities[ class.itemMap[ action.best_mana_potion.item ] ].handler()
         end,
 
+    },
+
+    major_mana_potion = {
+        name = function() return GetItemInfo( 13444 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 13444,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 13444 ) > 0, "requires major_mana_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 13444 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 1800,
+
+        handler = function()
+            gain( 1800, "mana" )
+        end,
+    },
+
+    major_rejuvenation_potion = {
+        name = function() return GetItemInfo( 18253 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 18253,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 18253 ) > 0, "requires major_mana_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 18253 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 1600,
+
+        handler = function()
+            gain( 1600, "mana" )
+        end,
+    },
+
+    superior_mana_potion = {
+        name = function() return GetItemInfo( 13443 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 13443,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 13443 ) > 0, "requires superior_mana_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 13443 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 1200,
+
+        handler = function()
+            gain( 1200, "mana" )
+        end,
+    },
+
+    greater_mana_potion = {
+        name = function() return GetItemInfo( 6149 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 6149,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 6149 ) > 0, "requires greater_mana_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 6149 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 800,
+
+        handler = function()
+            gain( 800, "mana" )
+        end,
+    },
+
+    wildvine_potion = {
+        name = function() return GetItemInfo( 9144 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 9144,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 9144 ) > 0, "requires wildvine_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 9144 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 750,
+
+        handler = function()
+            gain( 750, "mana" )
+        end,
+    },
+
+    mana_potion = {
+        name = function() return GetItemInfo( 3827 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 3827,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 3827 ) > 0, "requires mana_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 3827 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 520,
+
+        handler = function()
+            gain( 520, "mana" )
+        end,
+    },
+
+    lesser_mana_potion = {
+        name = function() return GetItemInfo( 3385 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 3385,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 3385 ) > 0, "requires lesser_mana_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 3385 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 320,
+
+        handler = function()
+            gain( 320, "mana" )
+        end,
+    },
+
+    minor_mana_potion = {
+        name = function() return GetItemInfo( 2455 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 2455,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 2455 ) > 0, "requires minor_mana_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 2455 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 160,
+
+        handler = function()
+            gain( 160, "mana" )
+        end,
+    },
+
+    minor_rejuvenation_potion = {
+        name = function() return GetItemInfo( 2456 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 2456,
+        bagItem = true,
+
+        usable = function ()
+            return GetItemCount( 2456 ) > 0, "requires minor_rejuvenation_potion in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 2456 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 120,
+
+        handler = function()
+            gain( 120, "mana" )
+        end,
     },
 
     argent_mana_potion = {
@@ -3177,6 +3429,103 @@ all:RegisterAbilities( {
 
         handler = function()
             gain( 4200, "mana" )
+        end,
+    },
+
+    mana_rune = {
+        name = strformat( '|cff00ccff[%s %s]|r', BEST, GetSpellInfo( 16666 ) ),
+        link = strformat( '|cff00ccff[%s %s]|r', BEST, GetSpellInfo( 16666 ) ),
+        cast = 0,
+        cooldown = 120,
+        gcd = 'off',
+
+        startsCombat = false,
+        toggle = "potions",
+        texture = function()
+            local item = action.mana_rune.item
+            return GetItemIcon( item )
+        end,
+
+        isItem = true,
+        item = function()
+            if not Hekili.PLAYER_ENTERING_WORLD or not rawget( state, "mana" ) then return 12662 end
+            if GetItemCount( 20520 ) > 0 then return 20520 end
+            
+            return 12662
+        end,
+        bagItem = true,
+
+        usable = function ()
+            local item = action.mana_rune.item
+            return health.current > 1000 and GetItemCount( action.mana_rune.item ) > 0, "requires >1000 health, a mana deficit, and mana_rune in bags"
+        end,
+
+        readyTime = function ()
+            local item = action.mana_rune.item
+            if item == 0 then return 3600 end
+            local start, dur = GetItemCooldown( item )
+            return max( 0, start + dur - query_time )
+        end,
+
+        handler = function ()
+            class.abilities[ class.itemMap[ action.mana_rune.item ] ].handler()
+        end,
+
+    },
+
+    demonic_rune = {
+        name = function() return GetItemInfo( 12662 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 12662,
+        bagItem = true,
+
+        usable = function ()
+            return health.current > 1000 and GetItemCount( 12662 ) > 0, "requires demonic_rune in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 12662 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 1200,
+
+        handler = function()
+            gain( 1200, "mana" )
+            spend( 1000, "health" )
+        end,
+    },
+
+    dark_rune = {
+        name = function() return GetItemInfo( 20520 ) end,
+        cast = 0,
+        cooldown = 120,
+        gcd = "off",
+
+        startsCombat = false,
+
+        item = 20520,
+        bagItem = true,
+
+        usable = function ()
+            return health.current > 1000 and GetItemCount( 20520 ) > 0, "requires dark_rune in bags"
+        end,
+
+        readyTime = function ()
+            local start, duration = GetItemCooldown( 20520 )
+            return max( 0, start + duration - query_time )
+        end,
+
+        mana_restored = 1200,
+
+        handler = function()
+            gain( 1200, "mana" )
+            spend( 1000, "health" )
         end,
     },
 
@@ -6119,7 +6468,6 @@ all:RegisterAura( 'norgannons_command', {
     duration = 15,
     max_stack = 6
 } )
-
 
 -- Legion TW
 all:RegisterAbilities( {

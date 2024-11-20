@@ -1,4 +1,6 @@
 actions.innervate_or_shift+=/innervate,if=settings.innervate_enabled&action.innervate.known&mana.pct<=innervate_threshold&ttd>2
+actions.innervate_or_shift+=/best_mana_potion
+actions.innervate_or_shift+=/mana_rune
 actions.innervate_or_shift+=/cat_form
 
 actions.precombat+=/mark_of_the_wild,if=!up&!buff.gift_of_the_wild.up
