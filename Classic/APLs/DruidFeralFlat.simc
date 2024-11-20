@@ -5,12 +5,14 @@ actions.innervate_or_shift+=/cat_form
 
 actions.precombat+=/mark_of_the_wild,if=!up&!buff.gift_of_the_wild.up
 actions.precombat+=/thorns,if=!up
-actions.precombat+=/cat_form,if=!up&!buff.bear_form.up
+actions.precombat+=/cat_form,if=!buff.form.up
 
 actions+=/use_items,if=!buff.cat_form.up
 actions+=/potion,if=!buff.cat_form.up
+actions+=/best_mana_potion,if=!buff.form.up&mana.current<action.cat_form.cost
+actions+=/mana_rune,if=!buff.form.up&mana.current<action.cat_form.cost
+actions+=/cat_form,if=!buff.form.up
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
-actions+=/cat_form,if=!up
 actions+=/run_action_list,name=cat_oom,if=!(mana.current>=settings.powershift_enabled&(set_bonus.wolfshead=1|talent.furor.rank=5)&mana.current>=action.cat_form.cost)
 actions+=/run_action_list,name=cat_ps
 
