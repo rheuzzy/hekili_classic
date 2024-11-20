@@ -3131,6 +3131,7 @@ all:RegisterAbilities( {
 
         handler = function ()
             class.abilities[ class.itemMap[ action.best_mana_potion.item ] ].handler()
+            removeBuff("form")
         end,
 
     },
@@ -3469,6 +3470,7 @@ all:RegisterAbilities( {
 
         handler = function ()
             class.abilities[ class.itemMap[ action.mana_rune.item ] ].handler()
+            removeBuff("form")
         end,
 
     },
