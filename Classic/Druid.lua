@@ -71,137 +71,12 @@ spec:RegisterStateExpr("ttd", function()
     return target.time_to_die
 end)
 
-spec:RegisterStateExpr("next_energy_tick", function()
-    local t = energy
-    local q = state.query_time
-    for i = 1, t.fcount do
-        local v = t.forecast[ i ]
-        if v.t >= q then
-            return v.t - q
-        end
-    end
-    return 2
+spec:RegisterStateExpr("combat_mode_solo", function()
+    return settings.combat_mode == "solo"
 end)
 
-spec:RegisterStateExpr("no_finisher", function()
-    local r = (
-        (not bite_enabled) and (not rip_enabled)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("should_bite", function()
-    local r = (
-        (settings.bite_enabled and action.ferocious_bite.known)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_now", function()
-    local r = (
-        (bite_enabled and action.ferocious_bite.known) and
-        (bite_before_rip or bite_over_rip) and
-        (combo_points.current >= settings.bite_cp)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_before_rip", function()
-    local r = (
-        (bite_enabled) and
-        (debuff.rip.up) and
-        (debuff.rip.remains >= settings.bite_time)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_before_rip_next", function()
-    local r = (
-        (bite_enabled) and
-        (bite_before_rip) and
-        (debuff.rip.remains - energy.time_to_tick >= settings.bite_time)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_over_rip", function()
-    local r = (
-        (bite_enabled) and
-        (not rip_enabled)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("bite_at_end", function()
-    local r = (
-        (bite_enabled or rip_enabled) and
-        (combo_points.current >= settings.bite_cp) and
-        ((ttd < end_thresh) or (debuff.rip.up and (ttd < debuff.rip.remains)))
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("should_rip", function()
-    local r = (
-        (settings.rip_enabled and action.rip.known)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("rip_now", function()
-    local r = (
-        (rip_enabled) and
-        (combo_points.current >= settings.rip_cp and (not debuff.rip.up)) and
-        (ttd >= end_thresh)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("rip_next", function()
-    local r = (
-        (rip_enabled) and
-        (rip_now or ((combo_points.current >= settings.rip_cp) and (debuff.rip.remains <= energy.time_to_tick))) and
-        (ttd - energy.time_to_tick >= end_thresh)
-    )
-    return r
-end)
-
-spec:RegisterStateExpr("should_innervate", function()
-    local r = (
-        (settings.innervate_enabled and action.innervate.known)
-    )
-    return r
-end)
-
-
-spec:RegisterStateExpr("innervate_before_bite", function()
-    if not should_innervate then
-        return false
-    end
-    local wait = false
-    if ((energy.current >= 28) and bite_before_rip and (not bite_before_rip_next)) then
-        wait = true
-    elseif ((energy.current >= 15) and ((not bite_before_rip) or bite_before_rip_next or bite_at_end)) then
-        wait = true
-    elseif (not rip_next) then
-        return true
-    else
-        wait = true
-    end
-
-    if wait and (energy.time_to_tick > settings.powershift_time) then
-        return true
-    end
-
-    return false
-end)
-
-spec:RegisterStateExpr("should_powershift", function()
-    local r = (
-        (settings.powershift_enabled) and
-        (set_bonus.wolfshead == 1 or talent.furor.rank == 5)
-    )
-    return r
+spec:RegisterStateExpr("combat_mode_group", function()
+    return settings.combat_mode == "group"
 end)
 
 -- Form Helper
@@ -1885,6 +1760,18 @@ spec:RegisterSetting( "druid_feral_header", nil, {
     name = "Feral: General"
 } )
 
+spec:RegisterSetting( "combat_mode", "group", {
+    type = "select",
+    name = "Combat Mode",
+    desc = "When Group mode is active, recommendations will be tuned for group damage. When Solo mode is active, recommendations will be tuned for solo / open world play.",
+    width = "full",
+    values = {
+        group = "Group",
+        solo = "Solo"
+    },
+    sorting = { "group", "solo" }
+} )
+
 spec:RegisterSetting( "powershift_enabled", true, {
     type = "toggle",
     name = "Use Powershifting",
@@ -1994,7 +1881,7 @@ if (Hekili.Version:match( "^Dev" )) then
 end
 
 -- Default Packs
-spec:RegisterPack( "Feral", 20241120.3, [[Hekili:TZvBVnkoq4Fl8LiIUT5cDB7UNus)WPvN0270ERuwD33aCatdQemYy2OEQIF7NTbmgW8sBsABArQQkGhpEMN5zgtiwJPH5pmx5ciqZVD(8ZVWW485ZmUyUX8lmxrUpcAUkc4Ch4w6hcbBP))pGyqa7U3hGaUSzhJsWo0rmxToXpG81qZ1Qu58l(ev2iOJ53mmmxTX31fMjkm2XC1)Ii)1FMAZvFQ9xWj(UP2Fh7JW(eFyC6nP38d0T3gatTbU)ee6aPJJreaXhfs)e0bTDlm0LFDCQTp9MKnuPDcaX0Rrr8bMrnDmYZpGAWaNSB5hgcX)KAWwiSv8gFpYVS8xf38d(ElJHeIF4TYIcdbRdGUtYus5aZUleTlCYwqiywKdzXYYPq2GHXBqbUtie3Rpp9MonG1WyIftnwriUp2T4CjXjHWEKZbqS8q4TmaTqWio6TgKPh8DwipQXcT25h4YCFTKOjARt88MDlvjYJoljsTAiBq4W48jRwKclHlex7SR4AumbQyjXqlFcCBCPCfZuE1PsMHt9kwDGTX6Nf8CsWyyizrEawOmhumrwDcGFp1thWrPq01Xk7kRa)yYhy5Klxdby2S4tIDHkVw5mzRjcLTK6Yw71Lu(i0oiMZEeCED6GwRrHjXZ2Hc8I3abUlnE4bciGo3zEjyeEggeE3YlNoPQAvHcthKDgfltzzUjh8tc(aJHG88SU1HAfLWhBSk8Z85eVZpcAvaAyATnH5D18gs7bGyFOLNpM(pEXjjRih)yMTFetB6cyJEdbEXO8ikBZpKeRaHzI6qZWCHC7MEjJ8WQrSu3y(0PQwVyATeEUjKMJF79LA9QpQsCQLJC8rjXwR9ZkPvAPS7ugAB5(vTnPRWWTa)Wyj3HppI)w40hEOfTPPcMMoTpGIRdNO2bevdqR)VJtkYPECbZQsxpugLLhge0Kb2SwAtWFHXCf6RGzCuOgt3th4izvt0ZrggnWIGO0bN7UwvjfoprHti43Ahnt8uodGQ3Hj5eDQpVG5Y0P0amoRPBSihE001EuwEzmxQueDnRFtJlNKT5CaT(QdiMPkQ1OKj3SQ1iB4uHnOPkkVNvRgJ(Nmr)g59N)5jhsWCI2bn2OqUZuTfMQ5QYBPv501oKginIDiv3(4VVc5BvPdYLgoovm6hcY1GcFCPcCM6amerze4G8CEJvopvQCQ)EQYP6NpCSY5ZhFRk88wSY5jXxgT1CYdk39DvD0MLrvUjAXBhAmYEkhzNOkf3yIqfSWSfbtVBHMu9M6u9QNFMFEQr6YlgDrOGA7imYuEe4DF(1RzMIQxAX0kpnk(n4ZhnsVFeKK(8Rtp6T2BD(9J8X)nx9t61uQV0Px5CZv7a4qM8MR(62ieMWo9jxLANLLKAZstINLEJ5k(NyhlMSSj6N(g)m2KJFM)oDemnEH9bSBkhqsTxKABmV4GPWur13WtM2TYoionZhnjuBU11sp1M(NQyAQ9KuBvrLu7RxwBkorCP1sTReH53KgiYMHoZnsTNM9xP)qLLzJF81NnYhJElfufQ4s6V(Zgi7EpHW1fTcfAC75LfnKxD5AmdA8MRwZu6AMROUm3gE4HEwbT2ahHpmaikVoS8k(yMvgqWXXfYWyUQAbYptnySqzGiJjOThirD6DfF6QpkSwvdBCjFYCJT(VMxT0B(RjHXQVCKvpYQFMy1AQ5MLSYQhIag98Qr65i985JE2sH1Z)CHJCedNcl4OVmQMXzT9avTRP(qT8TJ0lK5i6u5SPJ7IC4qU3W5rTrKRxC(LQ29WHEj9Redx2sCxacfrGwzh6T8DVEcF5KpnUpzFzBpzw9WGO3p7tMfWg3NCOv7NoKV0M(4UKVV2LurWyCpY(2JuQe0Z9R)7ZVE3HDaLd7B89oTFCt2dy5Hkm8g7WQ6149BJSZr25Rd2jxG2QoBWhvSanpRps1OPJXO2gZh52JC7taUTq11EYdPFu1QhwJb8uhgT)dsps(hj)hCYV2a4)6n(QQ1jEVu8YHhBWpZFXL9Qgq7huKXAaJ1aErQbOnwg4PugOawESpcX(vbHO8(DEA3egsJUOe3fYw(6Dsj(qfDtPm0trhvskWrzuLULquXzJRyK6DbizBU4mQviROf)utOlKfQOL2uvgcR)w5bsc6bB0kogdL9SOsvlAbsDFc)6uh5EzNh)Ucfu0(GeqVGOVqeMQ0bF6aw77qUTVlyzSPVdEK8kPiS15bdHpx5wR0WYCyZyi)sAv95kvtA2(LkY3JB2eMsTxY)6WSIvnAgt8bVSOGrZLufop4Ae59BhvVuZHo9O4S8frpcR3mMervCE8rrZjtMNuTVM1BQK8KZ6MzpQKhLmmsjq1PV9cSdxJtPB7GJ6trOIxGyNh033rpCxxhgTk7HKHCv3KPZAA55Ss90QgVRlsEzO(sM4iyEpttoTjjiBdO8oSgtlDYoKBOA8TJVs6eTx271ASjBJgTw9nszocig6(3H5DHYu7V89v0i5x)hgcNWssnx9fO3)bC2WL38))d]] )
+spec:RegisterPack( "Feral", 20241120.3, [[Hekili:TZvBVnkoq4Fl8LiIUT5c9TDpPK(HtRoPT3P9wPS6UVXlbmnOsWiJzR2tv8B)8lGXaMxstsBtlsvvb84XZ8mpZycXAmnm)U5kphmW8RNp)8lnmo3y28pE58lmmxH)zmWCvSJ79o3r(qKZwY))daYjKE3FgcD8OZobMICjJyUADAqi(lrMRRPY5ZmU6QlU8CISXaxZVAqu(MappaxuqIR5Q)fI)R)mZMP(m7pJsd8YS)gkaIcWbGKSBZU97W7UleKz749dNixazCee7GdGrKpbCHB3cI8yxNKzhqUjEdrA3qNeY1Wy2aZiMoc6hesmyhx(TcIIaOFqmyliYkztGp(xw(RIB(Ha)Ljamoi6ozrbroRdbEt4kPCGz3hbFiAYwNiNzXU4fllNcEdcKSbg6nbJ9U58SB70awdsWwu1yfdz(y3IZKeLgb6roxhSLpeTLcOfcgZqV1oC9GU3c6tmwG1dbHEu3xlnEI26uF)z3ruI8OZsJvRg8gikkjFYQfPWsycX0o9kMgftGiwAcWkad2MukxXmLxDIKCCQxXQdSnwFEWZnfHar4f5byHYCHjyz1ja(9upDahLcrwhl(vwHbj4pqZjxUg4GOZInj6fQ8ALZKUMjWqiD284I1wOhGDVbnziKBV6YU6nL5lXWhaig1tKWOtg0Anmknz2dWq)KnahVLgp(i2jKm3z(PiiAgYj6(LxnDsv1QccNoi7morMVtXiwKln8du6f0336oxIvuI90XQqUZNtYdbXaRcehrkmkmVRN3qAFhakay5hGi)JvztYkkaFQDhetvNUa3i3qay0adKWvdIWjkGyQOUK8tpaZWjxsPE0kml1nMpDQYfKymq3ayAI16aEjUY1MENYOvl3V6QjDfcS1jikrYazZdhSfm9XhBrBAQC8Pt7Z1z6WnwTlsQ7)qD4MqxFwrB(6LqQ7ZQJci1JV7NLA96luj(B5yJeGOAaAmJLdMNPZeKVJA9qzmVMzyyZe(M771e8xymxH(kyghfQX090bosw1e9CKHsdSWqcDW9(BuvbNXtu4ec(T2rZepLZai6DysorN4ZlOUmzknaJZA6glYHhnDTDYYlJ5sLIiRz9BAC1e(dsfs2oZ1jHQkI1OKj3SQ1iB4uHnOPkkVNvRgJ(Nmr)g59N)PjhsWCI2bn2OqUZuTfMQ5QYBjv501oKgijIDiv3(4VVc5BvPdYLgoovm6hcY1GcFCPcCM4auerze4G8CEJvopvQCQ)EQYP6NpCSY5ZhFRk88wSY5jXxgT1CYdk39DvD0MLrvUjAXBhAmYEkhzNOkf3yIqf0WSfgrUBHMu9M6u9M(FMFEQr6YlgDrOGA7imYu2b8Up)61mtr1lTyALNgf9g85JgP37ajPp)60JER9wNFVJp(V5QFqUMq9LoPrxyU6bhuevEZvFzBmeHPNuOpMzZZsYSPPjjZYU1Cf7t0JWepBI8PVYopu54N5VtgbrIxOah6nLdiz2lYSnMxCiIOQO6B4HRDl(HMQz(OjMyZTUw6z2K)uftZSNKzRkQKzFZYAtXnMjTwMDLim7MKabFg6u3iZEk)Vs)Hil1gV41NnYgJClfufI4s6V(Zgi7EpHW1LTcfAm75LfnKxD5AmdA8MRwZu6AMROUmZgE8XEwbT2ahHpmaikVoS8kUlZIdemCCHmmMRQwG8Zudglugi4mbT9ajQtVR4txFHWAvnSXvSjZm26)AE1sVzVMekR(Qrw9iR(zIvRPMBwYkREicO0ZRhPNJ0ZNp6zlfwp)tfoYrmCkSGJ(YOAgN12du1UM6d1Y3osVqMJOtLZMoUlYHd5EdNh1grUEX5xQA3dh6L0VsmCzlXDbiuebALDO3Y396j8Lt(44(K9LT9Kz1ddIE)SpjpGnUp5qR2pDiFPn9XDjFFTlPIGX4EK9ThPujON7x)3NE9Ud7akh2347DA)4MShWYdvy4n2Hv1RX73gzNJSZxhStMaTvD2GnQybAEwFKQrtgJsTnMpYTh52NaCBHQR9Khs)OQvpSgd4PomA)hKEK8ps(p4KFTbW)1B8vvRt8EP4Ldp2GEM)Il7vnG2pOiJ1agRb8IudqBSmWtPmqbSSRpcX(vbbR8(DEA3egsJoEfZf4lF9UEfBOIoFfh9u09RKcCegvPBjevC24kgPEhBs2MloJAfYkAht1e6szHk6GqvLbt7fz(oPH9GnAfhJHY(lvPQfTRQUpHFDQJCVSZJFxHckA1tcOxq0xictvAysDaR9Di323fSm203bpsELue268GHWMRCBWAyzo0z09VKgTEIChYAy6TOLenK3Hyv8SsLQMDsRIAjjn7Nwz2lzFvBAHWg9vl2GxvumQ5sQkgo46p59YhvVsQHo94eEUOOxX1B2yQyhcwSxrtQtMdwT)21BAQ8K5D1UDkXuj7fxcuD6BVa7E24ea3o4O(ekQ4Lt25Hi(D0do21bDRY(tCKR6gyDwVmpNvQFz149OHZlX1xYedbZB)DYPnPH8n3YBwEuT0j7qU34X2Q)APtlFzB0RXg4n6zEn2Kwur9eo3zK4xq8Re8zC1AXBkX1jb493r5DF2m7p)Tveh4l)dvXP0IYMR(mW))CC3WK38))]] )
 
 spec:RegisterPackSelector( "balance", "Balance (IV)", "|T136096:0|t Balance",
     "If you have spent more points in |T136096:0|t Balance than in any other tree, this priority will be automatically selected for you.",

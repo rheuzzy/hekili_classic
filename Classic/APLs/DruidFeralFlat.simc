@@ -13,12 +13,17 @@ actions+=/best_mana_potion,if=!buff.form.up&mana.current<action.cat_form.cost
 actions+=/mana_rune,if=!buff.form.up&mana.current<action.cat_form.cost
 actions+=/cat_form,if=!buff.form.up
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
+actions+=/run_action_list,name=cat_solo,if=combat_mode_solo
 actions+=/run_action_list,name=cat_oom,if=!(mana.current>=settings.powershift_enabled&(set_bonus.wolfshead=1|talent.furor.rank=5)&mana.current>=action.cat_form.cost)
 actions+=/run_action_list,name=cat_ps
 
 actions.bear+=/maul,use_off_gcd=1,if=!buff.maul.up
 actions.bear+=/swipe_bear,if=rage.current>60
 actions.bear+=/faerie_fire_feral
+
+actions.cat_solo+=/rip,if=(settings.rip_enabled&combo_points.current>=settings.rip_cp&!debuff.rip.up&ttd>=(10))
+actions.cat_solo+=/ferocious_bite,if=(settings.bite_enabled&((settings.bite_enabled&debuff.rip.up&debuff.rip.remains>=settings.bite_time)|(settings.bite_enabled&!settings.rip_enabled))&combo_points.current>=settings.bite_cp)
+actions.cat_solo+=/claw
 
 actions.cat_oom+=/rip,if=(settings.rip_enabled&combo_points.current>=settings.rip_cp&!debuff.rip.up&ttd>=(10))
 actions.cat_oom+=/shred,if=energy.current>=63

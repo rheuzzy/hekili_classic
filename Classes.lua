@@ -610,7 +610,7 @@ local HekiliSpecMixin = {
             a.name = name or ability
             a.link = link or ability ]]
 
-            if a.key == "best_mana_potion" then
+            if a.key == "best_mana_potion" or a.key == "mana_rune" then
                 if ability then class.abilities[ ability ] = a end
                 if a.name  then class.abilities[ a.name ]  = a end
                 if a.link  then class.abilities[ a.link ]  = a end
@@ -3057,11 +3057,53 @@ all:RegisterAbilities( {
         end,
     },
 
+    mana_rune = {
+        name = strformat( '|cff00ccff[%s Rune]|r', BEST ),
+        link = strformat( '|cff00ccff[%s Rune]|r', BEST ),
+        cast = 0,
+        cooldown = 120,
+        gcd = 'off',
+
+        startsCombat = false,
+        toggle = "potions",
+        texture = function()
+            local item = action.mana_rune.item
+            return GetItemIcon( item )
+        end,
+
+        isItem = true,
+        item = function()
+            if not Hekili.PLAYER_ENTERING_WORLD or not rawget( state, "mana" ) then return 12662 end
+            if GetItemCount( 20520 ) > 0 then return 20520 end
+            
+            return 12662
+        end,
+        bagItem = true,
+
+        usable = function ()
+            local item = action.mana_rune.item
+            return health.current > 1000 and GetItemCount( action.mana_rune.item ) > 0, "requires >1000 health, a mana deficit, and mana_rune in bags"
+        end,
+
+        readyTime = function ()
+            local item = action.mana_rune.item
+            if item == 0 then return 3600 end
+            local start, dur = GetItemCooldown( item )
+            return max( 0, start + dur - query_time )
+        end,
+
+        handler = function ()
+            class.abilities[ class.itemMap[ action.mana_rune.item ] ].handler()
+            removeBuff("form")
+        end,
+
+    },
+
     best_mana_potion = {
         name = strformat( '|cff00ccff[%s %s]|r', BEST, GetSpellInfo( 3452 ) ),
         link = strformat( '|cff00ccff[%s %s]|r', BEST, GetSpellInfo( 3452 ) ),
         cast = 0,
-        cooldown = 60,
+        cooldown = 120,
         gcd = 'off',
 
         startsCombat = false,
@@ -3431,48 +3473,6 @@ all:RegisterAbilities( {
         handler = function()
             gain( 4200, "mana" )
         end,
-    },
-
-    mana_rune = {
-        name = strformat( '|cff00ccff[%s %s]|r', BEST, GetSpellInfo( 16666 ) ),
-        link = strformat( '|cff00ccff[%s %s]|r', BEST, GetSpellInfo( 16666 ) ),
-        cast = 0,
-        cooldown = 120,
-        gcd = 'off',
-
-        startsCombat = false,
-        toggle = "potions",
-        texture = function()
-            local item = action.mana_rune.item
-            return GetItemIcon( item )
-        end,
-
-        isItem = true,
-        item = function()
-            if not Hekili.PLAYER_ENTERING_WORLD or not rawget( state, "mana" ) then return 12662 end
-            if GetItemCount( 20520 ) > 0 then return 20520 end
-            
-            return 12662
-        end,
-        bagItem = true,
-
-        usable = function ()
-            local item = action.mana_rune.item
-            return health.current > 1000 and GetItemCount( action.mana_rune.item ) > 0, "requires >1000 health, a mana deficit, and mana_rune in bags"
-        end,
-
-        readyTime = function ()
-            local item = action.mana_rune.item
-            if item == 0 then return 3600 end
-            local start, dur = GetItemCooldown( item )
-            return max( 0, start + dur - query_time )
-        end,
-
-        handler = function ()
-            class.abilities[ class.itemMap[ action.mana_rune.item ] ].handler()
-            removeBuff("form")
-        end,
-
     },
 
     demonic_rune = {
