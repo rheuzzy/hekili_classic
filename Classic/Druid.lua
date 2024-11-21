@@ -165,12 +165,14 @@ spec:RegisterResource( Enum.PowerType.Energy, {
         last = function ()
             local last_tick = state.energy.last_tick > 0 and state.energy.last_tick or state.now
             local elapsed_time = max(0, state.query_time - last_tick)
-            local full_intervals = floor(elapsed_time / 2)
-            local rtn = last_tick + (full_intervals * 2)
+            local full_intervals = floor(elapsed_time / state.energy.tick_time_avg)
+            local rtn = last_tick + (full_intervals * state.energy.tick_time_avg)
             return rtn
         end,
 
-        interval = 2,
+        interval = function()
+            return state.energy.tick_time_avg
+        end,
 
         stop = function ( val )
             return false
