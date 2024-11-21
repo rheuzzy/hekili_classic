@@ -1154,6 +1154,8 @@ if Hekili.IsWrath() then
     }
 elseif Hekili.IsClassic() then
     ns.WrathTalentToSpellID = {
+        -- ## [[ DRUID ]] ##
+        -- Balance
         [23] = { 16814, 16815, 16816, 16817, 16818 }, -- Improved Wrath
         [24] = { 16689, 16810, 16811, 16812, 16813, 17329 }, -- Nature's Grasp
         [25] = { 17245, 17247, 17248, 17249 }, -- Improved Nature's Grasp
@@ -1171,49 +1173,99 @@ elseif Hekili.IsClassic() then
         [37] = { 16896, 16897, 16899, 16900, 16901 }, -- Moonfury
         [38] = { 24858 }, -- Moonkin Form
 
+        -- Feral
         [39] = { 16934, 16935, 16936, 16937, 16938 }, -- Ferocity
         [40] = { 16858, 16859, 16860, 16861, 16862 }, -- Feral Aggression
-
         [41] = { 16947, 16948, 16949, 16950, 16951 }, -- Feral Instinct
         [42] = { 16940, 16941 }, -- Brutal Impact
         [43] = { 16929, 16930, 16931, 16932, 16933 }, -- Thick Hide
-
         [44] = { 17002, 24866 }, -- Feline Swiftness
         [45] = { 16979 }, -- Feral Charge
         [46] = { 16942, 16943, 16944 }, -- Sharpened Claws
-
         [47] = { 16966, 16968 }, -- Improved Shred
         [48] = { 16972, 16974, 16975 }, -- Predatory Strikes
         [49] = { 16952, 16954 }, -- Blood Frenzy
         [50] = { 16958, 16961 }, -- Primal Fury
-        
         [51] = { 16998, 16999 }, -- Savage Fury
         [52] = { 16857, 17390, 17391, 17392 }, -- Faerie Fire (Feral)
-        
         [53] = { 17003, 17004, 17005, 17006, 24894 }, -- Heart of the Wild
-        
         [54] = { 17007 }, -- Leader of the Pack
         
+        -- Restoration
         [55] = { 17050, 17051, 17053, 17054, 17055 }, -- Improved Mark of the Wild
         [56] = { 17056, 17058, 17059, 17060, 17061 }, -- Furor
-
         [57] = { 17069, 17070, 17071, 17072, 17073 }, -- Improved Healing Touch
         [58] = { 17063, 17065, 17066, 17067, 17068 }, -- Nature's Focus
         [59] = { 17079, 17082 }, -- Improved Enrage
-        
         [60] = { 17106, 17107, 17108 }, -- Reflection
         [61] = { 5570, 24974, 24975, 24976, 24977 }, -- Insect Swarm
         [62] = { 17118, 17119, 17120, 17121, 17122 }, -- Subtlety
-        
         [63] = { 24968, 24969, 24970, 24971, 24972 }, -- Tranquil Spirit
         [64] = { 17111, 17112, 17113 }, -- Improved Rejuvenation
-        
         [65] = { 17116 }, -- Nature's Swiftness
         [66] = { 17104, 24943, 24944, 24945, 24946 }, -- Gift of Nature
         [67] = { 17123, 17124 }, -- Improved Tranquility
-        
         [68] = { 17074, 17075, 17076, 17077, 17078 }, -- Improved Regrowth
-        
         [69] = { 18562 }, -- Swiftmend
+
+        -- ## [[ WARRIOR ]] ##
+        -- Arms
+        [70] = { 12282, 12663, 12664 }, -- Improved Heroic Strike
+        [71] = { 16462, 16463, 16464, 16465, 16466 }, -- Deflection
+        [72] = { 772, 6546, 6547, 6548, 11572, 11573, 11574, 12659 }, -- Improved Rend
+        [73] = { 12285, 12697 }, -- Improved Charge
+        [74] = { 12295, 12676, 12677, 12678, 12679 }, -- Tactical Mastery
+        [75] = { 12287, 12665, 12666 }, -- Improved Thunder Clap
+        [76] = { 12290, 12963 }, -- Improved Overpower
+        [77] = { 12296 }, -- Anger Management
+        [78] = { 12834, 12849, 12867 }, -- Deep Wounds
+        [79] = { 12163, 12711, 12712, 12713, 12714 }, -- Two-Handed Weapon Specialization
+        [80] = { 16493, 16494 }, -- Impale
+        [81] = { 12785, 12700, 12781, 12783, 12784 }, -- Axe Specialization
+        [82] = { 12292 }, -- Sweeping Strikes
+        [83] = { 12704, 12284, 12701, 12702, 12703 }, -- Mace Specialization
+        [84] = { 12815, 12281, 12812, 12813, 12814 }, -- Sword Specialization
+        [85] = { 12833, 12165, 12830, 12831, 12832 }, -- Polearm Specialization
+        [86] = { 23695, 12289, 12668 }, -- Improved Hamstring
+        [87] = { 12294, 21551, 21552, 21553 },
+
+        -- Fury
+        [88] = { 12838, 12321, 12835, 12836, 12837 }, -- Booming Voice
+        [89] = { 12856, 12320, 12852, 12853, 12855 }, -- Cruelty
+        [90] = { 12879, 12324, 12876, 12877, 12878 }, -- Improved Demoralizing Shout
+        [91] = { 13002, 12322, 12999, 13000, 13001 }, -- Unbridled Wrath
+        [92] = { 20496, 12329, 12950 }, -- Improved Cleave
+        [93] = { 12323 }, -- Piercing Howl
+        [94] = { 16492, 16487, 16489 }, -- Blood Craze
+        [95] = { 12861, 12318, 12857, 12858, 12860 }, -- Improved Battle Shout
+        [96] = { 23588, 23584, 23585, 23586, 23587 }, -- Dual Wield Specialization
+        [97] = { 20503, 20502 }, -- Improved Execute
+        [98] = { 13048, 12317, 13045, 13046, 13047 }, -- Enrage
+        [99] = { 20499, 12330, 12862, 20497, 20498 }, -- Improved Slam
+        [100] = { 12328 }, -- Death Wish
+        [101] = { 20505, 20504 }, -- Improved Intercept
+        [102] = { 20501, 20500 }, -- Improved Berserker Rage
+        [103] = { 12974, 12319, 12971, 12972, 12973 }, -- Flurry
+        [104] = { 23881, 23892, 23893, 23894 }, -- Bloodthirst
+
+        -- Protection
+        [105] = { 12727, 12298, 12724, 12725, 12726 }, -- Shield Specialization
+        [106] = { 12753, 12297, 12750, 12751, 12752 }, -- Anticipation
+        [107] = { 12818, 12301 }, -- Improved Bloodrage
+        [108] = { 12764, 12299, 12761, 12762, 12763 }, -- Toughness
+        [109] = { 12962, 12300, 12959, 12960, 12961 }, -- Iron Will
+        [110] = { 12975 }, -- Last Stand
+        [111] = { 12945, 12307, 12944 }, -- Improved Shield Block
+        [112] = { 12800, 12797, 12799 }, -- Improved Revenge
+        [113] = { 12792, 12303, 12788, 12789, 12791 }, -- Defiance
+        [114] = { 12810, 12308, 12811 }, -- Improved Sunder Armor
+        [115] = { 12807, 12313, 12804 }, -- Improved Disarm
+        [116] = { 12765, 12302 }, -- Improved Taunt
+        [117] = { 12803, 12312 }, -- Improved Shield Wall
+        [118] = { 12809 }, -- Concussion Blow
+        [119] = { 12958, 12311 }, -- Improved Shield Bash
+        [120] = { 16542, 16538, 16539, 16540, 16541 }, -- One-Handed Weapon Specialization
+        [121] = { 23922, 23923, 23924, 23925 }, -- Shield Slam
+
     }
 end
