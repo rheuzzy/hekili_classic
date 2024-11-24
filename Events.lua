@@ -1334,7 +1334,7 @@ local spell_names = setmetatable( {}, {
     end
 } )
 
-local lastPowerUpdate = 0
+local lastPowerUpdate = 0a
 local lastObservedEnergy = UnitPower( "player", Enum.PowerType.Energy )
 
 local function UNIT_POWER_FREQUENT( event, unit, power )
